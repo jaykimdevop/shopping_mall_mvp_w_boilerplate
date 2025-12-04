@@ -12,6 +12,9 @@ import { auth } from "@clerk/nextjs/server";
  * - Clerk 토큰을 Supabase가 자동 검증
  * - auth().getToken()으로 현재 세션 토큰 사용
  *
+ * 주의: accessToken 옵션을 사용하면 Supabase의 auth 모듈이 비활성화됩니다.
+ * 이는 정상적인 동작이며, Clerk 인증을 사용하므로 Supabase auth는 필요하지 않습니다.
+ *
  * @example
  * ```tsx
  * // Server Component

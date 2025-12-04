@@ -2,6 +2,7 @@ import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
+import CartBadge from "@/components/cart-badge";
 
 const Navbar = () => {
   return (
@@ -10,6 +11,9 @@ const Navbar = () => {
         SaaS Template
       </Link>
       <div className="flex gap-4 items-center">
+        <SignedIn>
+          <CartBadge />
+        </SignedIn>
         <SignedOut>
           <SignInButton mode="modal">
             <Button>로그인</Button>

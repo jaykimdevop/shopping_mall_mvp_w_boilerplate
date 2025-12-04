@@ -8,6 +8,7 @@ import RelatedProducts from "@/components/related-products";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import AddToCartButton from "@/components/add-to-cart-button";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -149,24 +150,11 @@ async function ProductDetail({ productId }: { productId: string }) {
 
           {/* 구분선 */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-            {/* 수량 선택 */}
-            <div className="mb-6">
-              <QuantitySelector
-                min={1}
-                max={typedProduct.stock_quantity}
-                initialValue={1}
-                disabled={stockStatus.disabled}
-              />
-            </div>
-
-            {/* 장바구니 추가 버튼 */}
-            <Button
-              size="lg"
-              className="w-full"
+            {/* 수량 선택 및 장바구니 추가 */}
+            <AddToCartButton
+              product={typedProduct}
               disabled={stockStatus.disabled}
-            >
-              {stockStatus.disabled ? "품절" : "장바구니에 추가"}
-            </Button>
+            />
           </div>
 
           {/* 설명 */}
