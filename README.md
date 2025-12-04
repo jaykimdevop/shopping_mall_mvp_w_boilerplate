@@ -403,5 +403,7 @@ saas-template/
 - [Supabase + Next.js 설정 가이드](./docs/SUPABASE_NEXTJS_SETUP.md) - Supabase 공식 문서 기반 설정 가이드
 - [Clerk + Supabase 통합 가이드](./docs/CLERK_SUPABASE_INTEGRATION.md) - 상세한 통합 설정 및 사용법
 - [Clerk + Supabase 설정 가이드](./docs/SETUP_GUIDE.md) - 단계별 설정 방법
+- [Clerk 한국어 로컬라이제이션 가이드](./docs/CLERK_LOCALIZATION.md) - Clerk 컴포넌트 한국어 설정
+- [어드민 상품 관리 가이드](./docs/ADMIN_PRODUCT_MANAGEMENT.md) - Supabase 대시보드에서 상품 등록/수정 방법
 - [프로젝트 구조 가이드](./docs/DIR.md)
 - [개발 TODO](./docs/TODO.md)

@@ -38,10 +38,9 @@ export async function updateSupabaseSession(request: NextRequest) {
     }
   );
 
-  // 세션 갱신 (Clerk를 사용하는 경우에도 Supabase 클라이언트 세션 관리)
-  // 주의: Clerk 세션 토큰은 accessToken으로 제공되므로,
-  // 여기서는 Supabase 클라이언트의 내부 세션만 갱신합니다
-  await supabase.auth.getUser();
+  // Clerk를 사용하는 경우, Supabase 인증 시스템을 사용하지 않으므로
+  // auth.getUser() 호출을 제거합니다.
+  // Clerk 세션은 Clerk 미들웨어에서 관리됩니다.
 
   return supabaseResponse;
 }
