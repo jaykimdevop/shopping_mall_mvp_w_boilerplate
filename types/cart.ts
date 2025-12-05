@@ -38,6 +38,7 @@ export interface AddToCartResult {
   success: boolean;
   message?: string;
   cartItem?: CartItem;
+  requiresAuth?: boolean; // 로그인이 필요한 경우 true
 }
 
 /**
@@ -47,6 +48,7 @@ export interface UpdateCartQuantityResult {
   success: boolean;
   message?: string;
   cartItem?: CartItem;
+  requiresAuth?: boolean; // 로그인이 필요한 경우 true
 }
 
 /**
@@ -55,5 +57,6 @@ export interface UpdateCartQuantityResult {
 export interface RemoveCartItemResult {
   success: boolean;
   message?: string;
+  requiresAuth?: boolean; // 로그인이 필요한 경우 true
 }
 

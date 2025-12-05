@@ -10,6 +10,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import QuantitySelector from "@/components/quantity-selector";
 import { Button } from "@/components/ui/button";
 import { addToCart } from "@/actions/cart";
@@ -38,23 +39,63 @@ export default function AddToCartButton({
 
     startTransition(async () => {
       try {
+        console.log("[AddToCartButton] Calling addToCart:", { productId: product.id, quantity });
         const result = await addToCart(product.id, quantity);
+        console.log("[AddToCartButton] Result:", result);
+        console.log("[AddToCartButton] Result type:", typeof result);
+        console.log("[AddToCartButton] Result keys:", result ? Object.keys(result) : "null/undefined");
+        
+        // result가 null이거나 undefined인 경우 처리
+        if (!result) {
+          console.error("[AddToCartButton] Result is null or undefined");
+          toast.error("장바구니 추가에 실패했습니다", {
+            description: "서버 응답이 없습니다.",
+          });
+          return;
+        }
+
+        // result가 객체가 아닌 경우 처리
+        if (typeof result !== "object") {
+          console.error("[AddToCartButton] Result is not an object:", result);
+          toast.error("장바구니 추가에 실패했습니다", {
+            description: "잘못된 서버 응답입니다.",
+          });
+          return;
+        }
+
         if (result.success) {
-          // 성공 시 장바구니 페이지로 이동하거나 토스트 메시지 표시
-          alert(result.message || "장바구니에 추가되었습니다.");
-          // 네비게이션 배지 업데이트를 위해 페이지 새로고침
+          // 성공 시 네비게이션 배지 업데이트를 위해 페이지 새로고침
           router.refresh();
+          // 성공 메시지 표시
+          toast.success("장바구니에 추가되었습니다", {
+            description: `${product.name} ${quantity}개`,
+          });
         } else {
+          console.error("[AddToCartButton] Failed:", result);
+          console.error("[AddToCartButton] Failed - success:", result.success);
+          console.error("[AddToCartButton] Failed - message:", result.message);
+          console.error("[AddToCartButton] Failed - requiresAuth:", result.requiresAuth);
+
           // 로그인이 필요한 경우 리다이렉트
-          if (result.message?.includes("로그인이 필요")) {
+          if (result.requiresAuth || result.message?.includes("로그인이 필요")) {
+            toast.error("로그인이 필요합니다", {
+              description: "로그인 페이지로 이동합니다.",
+            });
             router.push("/sign-in");
             return;
           }
-          alert(result.message || "장바구니 추가에 실패했습니다.");
+
+          // 에러 메시지 표시
+          toast.error("장바구니 추가에 실패했습니다", {
+            description: result.message || "알 수 없는 오류가 발생했습니다.",
+          });
         }
       } catch (error) {
-        console.error("Add to cart error:", error);
-        alert("장바구니 추가 중 오류가 발생했습니다.");
+        console.error("[AddToCartButton] Error:", error);
+        console.error("[AddToCartButton] Error stack:", error instanceof Error ? error.stack : "No stack");
+        toast.error("장바구니 추가 중 오류가 발생했습니다", {
+          description: "다시 시도해주세요.",
+        });
       }
     });
   };

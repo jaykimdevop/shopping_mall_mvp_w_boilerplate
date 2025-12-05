@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install:*)",
+      "Bash(rm:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(cmd //c \"taskkill /PID 15128 /F\")",
+      "Bash(pnpx shadcn@latest add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
