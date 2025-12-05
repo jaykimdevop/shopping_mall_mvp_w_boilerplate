@@ -1,58 +1,32 @@
+/**
+ * @file app/page.tsx
+ * @description Coloshop 스타일 홈페이지
+ *
+ * 구조:
+ * 1. 히어로 슬라이더
+ * 2. 카테고리 배너 (3컬럼)
+ * 3. 신상품 그리드
+ * 4. Deal of the Week
+ * 5. 베스트셀러 슬라이더
+ * 6. 혜택 섹션
+ * 7. 뉴스레터
+ */
+
 import { Suspense } from "react";
 import { createPublicSupabaseClient } from "@/lib/supabase/server-public";
+import HeroSlider from "@/components/hero-slider";
+import CategoryBanner from "@/components/category-banner";
 import ProductGrid from "@/components/product-grid";
-import CategoryGrid from "@/components/category-grid";
-import PromotionSection from "@/components/promotion-section";
+import ProductSlider from "@/components/product-slider";
+import DealOfWeek from "@/components/deal-of-week";
+import BenefitsSection from "@/components/benefits-section";
+import NewsletterSection from "@/components/newsletter-section";
 import type { Product } from "@/types/product";
-import type { Category } from "@/types/category";
-
-/**
- * 카테고리 목록 데이터 페칭 컴포넌트
- */
-async function CategoryList() {
-  const supabase = await createPublicSupabaseClient();
-
-  // 카테고리별 상품 개수 조회
-  const { data: products, error } = await supabase
-    .from("products")
-    .select("category")
-    .eq("is_active", true);
-
-  if (error) {
-    console.error("Error fetching categories:", error);
-    return null;
-  }
-
-  // 카테고리별 개수 계산
-  const categoryCounts = new Map<string, number>();
-  products?.forEach((product) => {
-    if (product.category) {
-      categoryCounts.set(
-        product.category,
-        (categoryCounts.get(product.category) || 0) + 1
-      );
-    }
-  });
-
-  // Category 배열로 변환
-  const categories: Category[] = Array.from(categoryCounts.entries()).map(
-    ([code, count]) => ({
-      code,
-      name: code,
-      count,
-    })
-  );
-
-  // 상품 개수 기준 내림차순 정렬
-  categories.sort((a, b) => b.count - a.count);
-
-  return <CategoryGrid categories={categories} />;
-}
 
 /**
  * 신상품 데이터 페칭 컴포넌트
  */
-async function NewProducts() {
+async function NewArrivals() {
   const supabase = await createPublicSupabaseClient();
 
   const { data: products, error } = await supabase
@@ -60,7 +34,7 @@ async function NewProducts() {
     .select("*")
     .eq("is_active", true)
     .order("created_at", { ascending: false })
-    .limit(8);
+    .limit(10);
 
   if (error) {
     console.error("Error fetching new products:", error);
@@ -68,176 +42,134 @@ async function NewProducts() {
   }
 
   return (
-    <PromotionSection
+    <ProductGrid
       products={(products as Product[]) || []}
       title="신상품"
+      showTitle={true}
     />
   );
 }
 
 /**
- * 상품 목록 데이터 페칭 컴포넌트
- * 
- * 상품 목록은 공개 데이터이므로 인증이 필요 없습니다.
- * 공개 서버 클라이언트를 사용하여 데이터를 가져옵니다.
+ * 베스트셀러 데이터 페칭 컴포넌트
  */
-async function ProductList() {
+async function BestSellers() {
   const supabase = await createPublicSupabaseClient();
 
+  // 실제로는 판매량 기준으로 정렬해야 하지만, 현재는 재고가 적은 순으로 대체
   const { data: products, error } = await supabase
     .from("products")
     .select("*")
     .eq("is_active", true)
-    .order("created_at", { ascending: false })
-    .limit(20);
+    .order("stock_quantity", { ascending: true })
+    .limit(10);
 
   if (error) {
-    console.error("Error fetching products:", error);
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600 dark:text-red-400">
-          상품을 불러오는 중 오류가 발생했습니다.
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-          {error.message}
-        </p>
-      </div>
-    );
+    console.error("Error fetching best sellers:", error);
+    return null;
   }
 
-  return <ProductGrid products={(products as Product[]) || []} />;
+  return (
+    <ProductSlider
+      title="베스트셀러"
+      products={(products as Product[]) || []}
+    />
+  );
 }
 
 /**
- * 로딩 스켈레톤 UI
+ * 로딩 스켈레톤 - 상품 그리드
  */
 function ProductGridSkeleton() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse"
-        >
-          <div className="w-full aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
-          <div className="p-4 space-y-2">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mt-2" />
-          </div>
+    <section className="py-12 sm:py-16">
+      <div className="container mx-auto px-4">
+        {/* 타이틀 스켈레톤 */}
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="h-10 bg-muted rounded w-40 mx-auto animate-pulse" />
         </div>
-      ))}
-    </div>
-  );
-}
 
-/**
- * 카테고리 섹션 스켈레톤 UI
- */
-function CategoryGridSkeleton() {
-  return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3">
-      {Array.from({ length: 7 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse p-3 sm:p-4"
-        >
-          <div className="flex flex-col items-center space-y-2">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 dark:bg-gray-700" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-12" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/**
- * 프로모션 섹션 스켈레톤 UI
- */
-function PromotionSectionSkeleton() {
-  return (
-    <div className="w-full">
-      <div className="mb-6">
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2" />
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48" />
-      </div>
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4 sm:gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
+        {/* 그리드 스켈레톤 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
-              className="flex-shrink-0 w-[280px] sm:w-[320px] bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse"
+              className="bg-background border border-border rounded-lg overflow-hidden animate-pulse"
             >
-              <div className="w-full aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
-              <div className="p-4 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
-                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mt-2" />
+              <div className="w-full aspect-square bg-muted" />
+              <div className="p-4 space-y-3">
+                <div className="h-3 bg-muted rounded w-1/4" />
+                <div className="h-4 bg-muted rounded w-3/4" />
+                <div className="h-4 bg-muted rounded w-1/2" />
+                <div className="h-8 bg-muted rounded w-full mt-2" />
               </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+/**
+ * 로딩 스켈레톤 - 슬라이더
+ */
+function SliderSkeleton() {
+  return (
+    <section className="py-12 sm:py-16">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="h-10 bg-muted rounded w-40 mx-auto animate-pulse" />
+        </div>
+        <div className="flex gap-4 overflow-hidden">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-shrink-0 w-[200px] bg-background border border-border rounded-lg overflow-hidden animate-pulse"
+            >
+              <div className="w-full aspect-square bg-muted" />
+              <div className="p-4 space-y-2">
+                <div className="h-4 bg-muted rounded w-3/4 mx-auto" />
+                <div className="h-4 bg-muted rounded w-1/2 mx-auto" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
 /**
  * 홈 페이지
- * 카테고리 → 프로모션(신상품) → 전체 상품 목록 순서로 표시합니다.
  */
 export default function Home() {
   return (
-    <div className="min-h-[calc(100vh-80px)] px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-      <div className="w-full max-w-7xl mx-auto space-y-16">
-        {/* 페이지 헤더 */}
-        <div>
-          <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-            쇼핑몰에 오신 것을 환영합니다
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            다양한 상품을 만나보세요
-          </p>
-        </div>
+    <div className="min-h-screen">
+      {/* 히어로 슬라이더 */}
+      <HeroSlider />
 
-        {/* 카테고리 섹션 */}
-        <section>
-          <div className="mb-4">
-            <h2 className="text-xl lg:text-2xl font-bold">카테고리</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              원하는 카테고리를 선택하세요
-            </p>
-          </div>
-          <Suspense fallback={<CategoryGridSkeleton />}>
-            <CategoryList />
-          </Suspense>
-        </section>
+      {/* 카테고리 배너 */}
+      <CategoryBanner />
 
-        {/* 프로모션 섹션 (신상품) */}
-        <section>
-          <Suspense fallback={<PromotionSectionSkeleton />}>
-            <NewProducts />
-          </Suspense>
-        </section>
+      {/* 신상품 */}
+      <Suspense fallback={<ProductGridSkeleton />}>
+        <NewArrivals />
+      </Suspense>
 
-        {/* 전체 상품 목록 */}
-        <section>
-          <div className="mb-6">
-            <h2 className="text-2xl lg:text-3xl font-bold">전체 상품</h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              모든 상품을 둘러보세요
-            </p>
-          </div>
-          <Suspense fallback={<ProductGridSkeleton />}>
-            <ProductList />
-          </Suspense>
-        </section>
-      </div>
+      {/* Deal of the Week */}
+      <DealOfWeek />
+
+      {/* 베스트셀러 */}
+      <Suspense fallback={<SliderSkeleton />}>
+        <BestSellers />
+      </Suspense>
+
+      {/* 혜택 섹션 */}
+      <BenefitsSection />
+
+      {/* 뉴스레터 */}
+      <NewsletterSection />
     </div>
   );
 }

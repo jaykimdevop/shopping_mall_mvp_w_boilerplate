@@ -17,22 +17,25 @@ import type {
   CreateOrderResult,
   GetOrderResult,
   GetOrdersResult,
+  GuestOrderLookupInput,
+  GuestOrderLookupResult,
 } from "@/types/order";
 import type { CartItem } from "@/types/cart";
 
 /**
  * 주문 생성
  * 장바구니 아이템을 주문으로 변환합니다.
+ * 회원/비회원 모두 지원합니다.
  * 
  * 처리 순서:
- * 1. 인증 확인
- * 2. 장바구니 아이템 조회
+ * 1. 인증 확인 (비회원인 경우 guestEmail/guestPhone 필수)
+ * 2. 장바구니 아이템 조회 (비회원인 경우 클라이언트에서 전달받음)
  * 3. 재고 확인 (각 상품별)
  * 4. 합계 검증 (클라이언트 vs 서버 계산)
  * 5. orders 테이블에 주문 생성
  * 6. order_items 테이블에 주문 상세 저장
  * 7. 재고 차감
- * 8. 장바구니 비우기
+ * 8. 장바구니 비우기 (회원인 경우)
  */
 export async function createOrder(
   input: CreateOrderInput
@@ -42,16 +45,31 @@ export async function createOrder(
     
     // 1. 인증 확인
     const { userId } = await auth();
-    if (!userId) {
-      console.log("User not authenticated");
-      console.groupEnd();
-      return {
-        success: false,
-        message: "로그인이 필요합니다.",
-        requiresAuth: true,
-      };
+    const isGuest = input.isGuest || !userId;
+    
+    console.log("Order type:", isGuest ? "Guest" : "Member");
+    console.log("User ID:", userId || "N/A");
+
+    // 비회원인 경우 이메일 또는 전화번호 필수
+    if (isGuest) {
+      if (!input.guestEmail && !input.guestPhone) {
+        console.log("Guest order requires email or phone");
+        console.groupEnd();
+        return {
+          success: false,
+          message: "비회원 주문 시 이메일 또는 전화번호가 필요합니다.",
+        };
+      }
+      
+      if (!input.guestCartItems || input.guestCartItems.length === 0) {
+        console.log("Guest cart is empty");
+        console.groupEnd();
+        return {
+          success: false,
+          message: "장바구니가 비어있습니다.",
+        };
+      }
     }
-    console.log("User authenticated:", userId);
 
     // 입력 검증
     const { shippingAddress, orderNote, expectedTotal } = input;
@@ -70,29 +88,41 @@ export async function createOrder(
     console.log("Supabase client created");
 
     // 2. 장바구니 아이템 조회
-    console.log("Fetching cart items...");
-    const { data: cartItems, error: cartError } = await supabase
-      .from("cart_items")
-      .select("*")
-      .eq("clerk_id", userId);
+    let cartItems: Array<{ product_id: string; quantity: number }>;
+    
+    if (isGuest) {
+      // 비회원: 클라이언트에서 전달받은 장바구니 사용
+      cartItems = input.guestCartItems!;
+      console.log("Using guest cart items:", cartItems.length);
+    } else {
+      // 회원: DB에서 장바구니 조회
+      console.log("Fetching cart items from DB...");
+      const { data: dbCartItems, error: cartError } = await supabase
+        .from("cart_items")
+        .select("*")
+        .eq("clerk_id", userId);
 
-    if (cartError) {
-      console.error("Cart fetch error:", cartError);
-      console.groupEnd();
-      return {
-        success: false,
-        message: `장바구니 조회에 실패했습니다: ${cartError.message}`,
-      };
-    }
+      if (cartError) {
+        console.error("Cart fetch error:", cartError);
+        console.groupEnd();
+        return {
+          success: false,
+          message: `장바구니 조회에 실패했습니다: ${cartError.message}`,
+        };
+      }
 
-    if (!cartItems || cartItems.length === 0) {
-      console.log("Cart is empty");
-      console.groupEnd();
-      return {
-        success: false,
-        message: "장바구니가 비어있습니다.",
-      };
+      if (!dbCartItems || dbCartItems.length === 0) {
+        console.log("Cart is empty");
+        console.groupEnd();
+        return {
+          success: false,
+          message: "장바구니가 비어있습니다.",
+        };
+      }
+      
+      cartItems = dbCartItems;
     }
+    
     console.log("Cart items count:", cartItems.length);
 
     // 상품 정보 조회
@@ -167,15 +197,26 @@ export async function createOrder(
 
     // 5. orders 테이블에 주문 생성
     console.log("Creating order...");
+    const orderData: Record<string, unknown> = {
+      total_amount: serverTotal,
+      status: "pending",
+      shipping_address: shippingAddress,
+      order_note: orderNote || null,
+    };
+    
+    if (isGuest) {
+      // 비회원 주문
+      orderData.clerk_id = null;
+      orderData.guest_email = input.guestEmail || null;
+      orderData.guest_phone = input.guestPhone || null;
+    } else {
+      // 회원 주문
+      orderData.clerk_id = userId;
+    }
+    
     const { data: newOrder, error: orderError } = await supabase
       .from("orders")
-      .insert({
-        clerk_id: userId,
-        total_amount: serverTotal,
-        status: "pending",
-        shipping_address: shippingAddress,
-        order_note: orderNote || null,
-      })
+      .insert(orderData)
       .select("*")
       .single();
 
@@ -236,18 +277,22 @@ export async function createOrder(
     }
     console.log("Stock deducted");
 
-    // 8. 장바구니 비우기
-    console.log("Clearing cart...");
-    const { error: clearCartError } = await supabase
-      .from("cart_items")
-      .delete()
-      .eq("clerk_id", userId);
+    // 8. 장바구니 비우기 (회원인 경우만)
+    if (!isGuest && userId) {
+      console.log("Clearing cart...");
+      const { error: clearCartError } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("clerk_id", userId);
 
-    if (clearCartError) {
-      console.error("Clear cart error:", clearCartError);
-      // 장바구니 삭제 실패는 로그만 남기고 계속 진행 (주문은 이미 생성됨)
+      if (clearCartError) {
+        console.error("Clear cart error:", clearCartError);
+        // 장바구니 삭제 실패는 로그만 남기고 계속 진행 (주문은 이미 생성됨)
+      }
+      console.log("Cart cleared");
+    } else {
+      console.log("Guest order - client will clear local storage cart");
     }
-    console.log("Cart cleared");
 
     // 생성된 주문 조회 (order_items 포함)
     const { data: completeOrder, error: fetchOrderError } = await supabase
@@ -481,6 +526,106 @@ export async function getCartItemsForCheckout(): Promise<CartItem[]> {
   } catch (error) {
     console.error("Get cart items for checkout error:", error);
     return [];
+  }
+}
+
+/**
+ * 비회원 주문 조회
+ * 주문 번호 + 이메일 또는 전화번호로 주문을 조회합니다.
+ */
+export async function getGuestOrder(
+  input: GuestOrderLookupInput
+): Promise<GuestOrderLookupResult> {
+  try {
+    const { orderId, email, phone } = input;
+
+    // 입력 검증
+    if (!orderId) {
+      return {
+        success: false,
+        message: "주문 번호를 입력해주세요.",
+      };
+    }
+
+    if (!email && !phone) {
+      return {
+        success: false,
+        message: "이메일 또는 전화번호를 입력해주세요.",
+      };
+    }
+
+    const supabase = await createClerkSupabaseClient();
+
+    // 주문 조회 쿼리 빌드
+    let query = supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .is("clerk_id", null); // 비회원 주문만
+
+    // 이메일 또는 전화번호로 필터링
+    if (email) {
+      query = query.eq("guest_email", email);
+    } else if (phone) {
+      query = query.eq("guest_phone", phone);
+    }
+
+    const { data: order, error: orderError } = await query.maybeSingle();
+
+    if (orderError) {
+      console.error("Guest order fetch error:", orderError);
+      return {
+        success: false,
+        message: `주문 조회에 실패했습니다: ${orderError.message}`,
+      };
+    }
+
+    if (!order) {
+      return {
+        success: false,
+        message: "주문을 찾을 수 없습니다. 주문 번호와 연락처 정보를 확인해주세요.",
+      };
+    }
+
+    // 주문 상세 아이템 조회
+    const { data: orderItems, error: itemsError } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", orderId);
+
+    if (itemsError) {
+      console.error("Order items fetch error:", itemsError);
+    }
+
+    // 상품 정보 조회
+    if (orderItems && orderItems.length > 0) {
+      const productIds = orderItems.map((item) => item.product_id);
+      const { data: products } = await supabase
+        .from("products")
+        .select("*")
+        .in("id", productIds);
+
+      if (products) {
+        const productMap = new Map(products.map((p) => [p.id, p]));
+        orderItems.forEach((item: OrderItem) => {
+          item.product = productMap.get(item.product_id);
+        });
+      }
+    }
+
+    return {
+      success: true,
+      order: {
+        ...order,
+        order_items: orderItems || [],
+      },
+    };
+  } catch (error) {
+    console.error("Get guest order error:", error);
+    return {
+      success: false,
+      message: `주문 조회에 실패했습니다: ${error instanceof Error ? error.message : String(error)}`,
+    };
   }
 }
 

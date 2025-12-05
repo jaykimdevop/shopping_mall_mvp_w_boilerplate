@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { koKR } from "@clerk/localizations";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins, Geist_Mono } from "next/font/google";
 
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -19,8 +22,69 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "모두쇼핑",
+  title: {
+    default: "모두쇼핑",
+    template: "%s | 모두쇼핑",
+  },
   description: "간편하고 빠른 온라인 쇼핑몰",
+  keywords: ["쇼핑몰", "온라인 쇼핑", "의류", "패션"],
+  authors: [{ name: "모두쇼핑" }],
+  creator: "모두쇼핑",
+  publisher: "모두쇼핑",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.vercel.app"
+  ),
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: "/",
+    siteName: "모두쇼핑",
+    title: "모두쇼핑",
+    description: "간편하고 빠른 온라인 쇼핑몰",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "모두쇼핑",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "모두쇼핑",
+    description: "간편하고 빠른 온라인 쇼핑몰",
+    images: ["/og-image.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-256x256.png", sizes: "256x256", type: "image/png" },
+      { url: "/icons/icon-384x384.png", sizes: "384x384", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
+  manifest: "/manifest.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -38,11 +102,13 @@ export default function RootLayout({
     >
       <html lang="ko">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${poppins.variable} ${geistMono.variable} antialiased`}
+          style={{ fontFamily: "var(--font-poppins)" }}
         >
           <SyncUserProvider>
             <Navbar />
-            {children}
+            <main className="min-h-[calc(100vh-80px)]">{children}</main>
+            <Footer />
             <Toaster />
           </SyncUserProvider>
         </body>

@@ -15,6 +15,8 @@ import type {
   AddToCartResult,
   UpdateCartQuantityResult,
   RemoveCartItemResult,
+  SyncCartResult,
+  GuestCartItem,
 } from "@/types/cart";
 
 /**
@@ -694,6 +696,190 @@ export async function getCartItemCount(): Promise<number> {
   } catch (error) {
     console.error("Get cart count error:", error);
     return 0;
+  }
+}
+
+/**
+ * 비회원 장바구니를 회원 장바구니로 동기화
+ * 로그인 시 로컬 스토리지의 장바구니를 서버로 병합합니다.
+ */
+export async function syncGuestCartToServer(
+  guestItems: GuestCartItem[]
+): Promise<SyncCartResult> {
+  try {
+    // 인증 확인
+    const { userId } = await auth();
+    if (!userId) {
+      return {
+        success: false,
+        message: "로그인이 필요합니다.",
+      };
+    }
+
+    if (!guestItems || guestItems.length === 0) {
+      return {
+        success: true,
+        message: "동기화할 아이템이 없습니다.",
+        syncedItems: 0,
+      };
+    }
+
+    console.log("Syncing guest cart to server:", {
+      userId,
+      itemCount: guestItems.length,
+    });
+
+    const supabase = await createClerkSupabaseClient();
+    let syncedCount = 0;
+
+    for (const guestItem of guestItems) {
+      try {
+        // 상품 존재 및 재고 확인
+        const { data: product, error: productError } = await supabase
+          .from("products")
+          .select("id, stock_quantity, is_active")
+          .eq("id", guestItem.product_id)
+          .eq("is_active", true)
+          .single();
+
+        if (productError || !product) {
+          console.warn(
+            `Product not found or inactive: ${guestItem.product_id}`
+          );
+          continue;
+        }
+
+        // 기존 장바구니 아이템 확인
+        const { data: existingItem, error: existingError } = await supabase
+          .from("cart_items")
+          .select("id, quantity")
+          .eq("clerk_id", userId)
+          .eq("product_id", guestItem.product_id)
+          .maybeSingle();
+
+        if (existingError && existingError.code !== "PGRST116") {
+          console.error("Error checking existing cart item:", existingError);
+          continue;
+        }
+
+        if (existingItem) {
+          // 기존 아이템이 있으면 수량 합산 (재고 초과 시 재고 수량으로 제한)
+          const newQuantity = Math.min(
+            existingItem.quantity + guestItem.quantity,
+            product.stock_quantity
+          );
+
+          const { error: updateError } = await supabase
+            .from("cart_items")
+            .update({ quantity: newQuantity })
+            .eq("id", existingItem.id);
+
+          if (updateError) {
+            console.error("Error updating cart item:", updateError);
+            continue;
+          }
+        } else {
+          // 새 아이템 추가 (재고 초과 시 재고 수량으로 제한)
+          const quantity = Math.min(
+            guestItem.quantity,
+            product.stock_quantity
+          );
+
+          if (quantity > 0) {
+            const { error: insertError } = await supabase
+              .from("cart_items")
+              .insert({
+                clerk_id: userId,
+                product_id: guestItem.product_id,
+                quantity,
+              });
+
+            if (insertError) {
+              console.error("Error inserting cart item:", insertError);
+              continue;
+            }
+          }
+        }
+
+        syncedCount++;
+      } catch (itemError) {
+        console.error(
+          `Error syncing item ${guestItem.product_id}:`,
+          itemError
+        );
+      }
+    }
+
+    console.log("Cart sync completed:", { syncedCount });
+
+    return {
+      success: true,
+      message: `${syncedCount}개의 상품이 장바구니에 추가되었습니다.`,
+      syncedItems: syncedCount,
+    };
+  } catch (error) {
+    console.error("Sync guest cart error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      message: `장바구니 동기화에 실패했습니다: ${errorMessage}`,
+    };
+  }
+}
+
+/**
+ * 상품 정보 조회 (비회원 장바구니용)
+ * 여러 상품 ID로 상품 정보를 조회합니다.
+ */
+export async function getProductsByIds(productIds: string[]): Promise<{
+  success: boolean;
+  products?: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    price: number;
+    category: string | null;
+    stock_quantity: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+  }>;
+  message?: string;
+}> {
+  try {
+    if (!productIds || productIds.length === 0) {
+      return {
+        success: true,
+        products: [],
+      };
+    }
+
+    const supabase = await createClerkSupabaseClient();
+
+    const { data: products, error } = await supabase
+      .from("products")
+      .select("*")
+      .in("id", productIds)
+      .eq("is_active", true);
+
+    if (error) {
+      console.error("Get products by ids error:", error);
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      products: products || [],
+    };
+  } catch (error) {
+    console.error("Get products by ids error:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 

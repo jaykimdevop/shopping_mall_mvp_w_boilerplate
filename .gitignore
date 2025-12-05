@@ -15,6 +15,9 @@ pnpm-lock.yaml
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/playwright/.cache/
 
 # next.js
 /.next/
@@ -26,6 +29,10 @@ pnpm-lock.yaml
 # misc
 .DS_Store
 *.pem
+Thumbs.db
+*.swp
+*.swo
+*~
 
 # debug
 npm-debug.log*
@@ -62,3 +69,20 @@ repomix-output.xml
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+.vercel

@@ -4,15 +4,19 @@
  *
  * 장바구니 페이지에서 총액 및 요약 정보를 표시하는 컴포넌트입니다.
  * 체크아웃 버튼을 포함합니다.
+ * 회원/비회원 장바구니 모두 지원합니다.
  */
 
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CartItem } from "@/types/cart";
+import type { CartItem, GuestCartItem } from "@/types/cart";
 
 interface CartSummaryProps {
   cartItems: CartItem[];
+  guestItems?: GuestCartItem[];
+  totalPrice?: number;
+  isGuest?: boolean;
 }
 
 /**
@@ -27,18 +31,37 @@ function formatPrice(price: number): string {
 
 /**
  * 장바구니 요약 컴포넌트
+ * 회원/비회원 장바구니 모두 지원
  */
-export default function CartSummary({ cartItems }: CartSummaryProps) {
-  const totalItems = cartItems.reduce(
+export default function CartSummary({
+  cartItems,
+  guestItems = [],
+  totalPrice: propTotalPrice,
+  isGuest = false,
+}: CartSummaryProps) {
+  // 회원 장바구니 계산
+  const memberTotalItems = cartItems.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
-  const totalPrice = cartItems.reduce(
+  const memberTotalPrice = cartItems.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
-  const itemCount = cartItems.length;
-  const isCartEmpty = cartItems.length === 0;
+  const memberItemCount = cartItems.length;
+
+  // 비회원 장바구니 계산
+  const guestTotalItems = guestItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+  const guestItemCount = guestItems.length;
+
+  // 통합 계산
+  const totalItems = isGuest ? guestTotalItems : memberTotalItems;
+  const totalPrice = propTotalPrice ?? memberTotalPrice;
+  const itemCount = isGuest ? guestItemCount : memberItemCount;
+  const isCartEmpty = itemCount === 0;
 
   return (
     <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 space-y-4 sticky top-8">
@@ -79,6 +102,12 @@ export default function CartSummary({ cartItems }: CartSummaryProps) {
             주문하기
           </Link>
         </Button>
+
+        {isGuest && (
+          <p className="text-xs text-yellow-600 dark:text-yellow-400 text-center mt-3">
+            비회원 주문 시 이메일/전화번호로 주문 조회 가능
+          </p>
+        )}
 
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3">
           배송비 무료 · 안전한 결제

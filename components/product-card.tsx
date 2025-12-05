@@ -1,21 +1,26 @@
 /**
  * @file components/product-card.tsx
- * @description 상품 카드 컴포넌트
+ * @description Coloshop 스타일 상품 카드 컴포넌트
  *
- * Grid 레이아웃에서 사용할 상품 카드 컴포넌트입니다.
- * 상품 이미지, 이름, 가격, 카테고리, 재고 상태, 설명을 표시합니다.
+ * 주요 기능:
+ * - 호버 시 장바구니 버튼 표시
+ * - 찜하기 아이콘
+ * - 할인/신상품 배지
+ * - 호버 시 그림자 + 테두리 효과
+ * - 다크모드 지원
  */
 
+"use client";
+
 import Link from "next/link";
+import { Heart } from "lucide-react";
 import type { Product } from "@/types/product";
+import AddToCartButton from "@/components/add-to-cart-button";
 
 interface ProductCardProps {
   product: Product;
 }
 
-/**
- * 가격을 천 단위 콤마로 포맷팅
- */
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("ko-KR", {
     style: "currency",
@@ -23,87 +28,104 @@ function formatPrice(price: number): string {
   }).format(price);
 }
 
-/**
- * 재고 상태를 확인하여 표시할 텍스트 반환
- */
 function getStockStatus(stockQuantity: number): {
   text: string;
   className: string;
 } {
   if (stockQuantity === 0) {
-    return { text: "품절", className: "text-red-600 font-semibold" };
+    return { text: "품절", className: "text-destructive font-semibold" };
   }
   if (stockQuantity < 10) {
-    return { text: `재고 ${stockQuantity}개`, className: "text-orange-600" };
+    return { text: `재고 ${stockQuantity}개`, className: "text-orange-500" };
   }
-  return { text: "재고 있음", className: "text-green-600" };
+  return { text: "재고 있음", className: "text-colo-green" };
 }
 
-/**
- * 상품 카드 컴포넌트
- */
 export default function ProductCard({ product }: ProductCardProps) {
   const stockStatus = getStockStatus(product.stock_quantity);
+  const isOutOfStock = product.stock_quantity === 0;
+  const isLowStock = product.stock_quantity > 0 && product.stock_quantity < 10;
 
   return (
-    <Link
-      href={`/products/${product.id}`}
-      className="group block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
-    >
-      {/* 상품 이미지 */}
-      <div className="relative w-full aspect-[4/3] bg-gray-100 dark:bg-gray-700 overflow-hidden">
-        {/* TODO: 실제 이미지 URL이 추가되면 Image 컴포넌트 사용 */}
-        <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
-          <svg
-            className="w-16 h-16"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
+    <div className="group relative bg-background border border-border rounded-lg overflow-hidden product-card-hover">
+      {/* 상품 이미지 링크 */}
+      <Link href={`/products/${product.id}`} className="block">
+        <div className="relative w-full aspect-square bg-muted overflow-hidden">
+          {/* 이미지 플레이스홀더 */}
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground group-hover:scale-105 trans-500">
+            <svg
+              className="w-16 h-16"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+
+          {/* 배지 */}
+          {isLowStock && (
+            <span className="product-badge product-badge-sale">한정</span>
+          )}
+          {!isLowStock && !isOutOfStock && product.stock_quantity >= 50 && (
+            <span className="product-badge product-badge-new">NEW</span>
+          )}
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">품절</span>
+            </div>
+          )}
         </div>
-      </div>
+      </Link>
+
+      {/* 찜하기 버튼 */}
+      <button
+        className="absolute top-3 right-3 w-8 h-8 bg-white/80 dark:bg-gray-800/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 trans-300 hover:bg-primary hover:text-white z-10"
+        onClick={(e) => {
+          e.preventDefault();
+          // 찜하기 기능 추가 예정
+        }}
+        aria-label="찜하기"
+      >
+        <Heart className="w-4 h-4" />
+      </button>
 
       {/* 상품 정보 */}
-      <div className="p-4 space-y-2">
+      <div className="p-4">
         {/* 카테고리 */}
         {product.category && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
             {product.category}
-          </div>
-        )}
-
-        {/* 상품명 */}
-        <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors">
-          {product.name}
-        </h3>
-
-        {/* 설명 */}
-        {product.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-            {product.description}
           </p>
         )}
 
+        {/* 상품명 */}
+        <Link href={`/products/${product.id}`}>
+          <h6 className="font-medium text-sm line-clamp-2 mb-2 group-hover:text-colo-purple trans-300 min-h-[40px]">
+            {product.name}
+          </h6>
+        </Link>
+
         {/* 가격 및 재고 */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex flex-col">
-            <span className="text-xl font-bold text-primary">
-              {formatPrice(product.price)}
-            </span>
-            <span className={`text-xs ${stockStatus.className}`}>
-              {stockStatus.text}
-            </span>
-          </div>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-primary font-semibold text-lg">
+            {formatPrice(product.price)}
+          </span>
+          <span className={`text-xs ${stockStatus.className}`}>
+            {stockStatus.text}
+          </span>
+        </div>
+
+        {/* 장바구니 버튼 - 호버 시 표시 */}
+        <div className="opacity-0 group-hover:opacity-100 trans-300 -translate-y-2 group-hover:translate-y-0">
+          <AddToCartButton product={product} disabled={isOutOfStock} />
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
-

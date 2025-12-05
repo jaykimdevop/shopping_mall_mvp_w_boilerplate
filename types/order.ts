@@ -49,27 +49,47 @@ export interface OrderItem {
 /**
  * 주문 타입
  * orders 테이블 구조
+ * 회원/비회원 주문 모두 지원
  */
 export interface Order {
   id: string;
-  clerk_id: string;
+  clerk_id: string | null; // 비회원인 경우 null
   total_amount: number;
   status: OrderStatus;
   shipping_address: ShippingAddress | null;
   order_note: string | null;
   created_at: string;
   updated_at: string;
+  // 비회원 주문 정보
+  guest_email?: string | null;
+  guest_phone?: string | null;
   // 주문 상세 조회 시 order_items를 JOIN할 경우
   order_items?: OrderItem[];
 }
 
 /**
  * 주문 생성 입력 타입
+ * 회원/비회원 주문 모두 지원
  */
 export interface CreateOrderInput {
   shippingAddress: ShippingAddress;
   orderNote?: string;
   expectedTotal: number; // 클라이언트에서 계산한 총액 (검증용)
+  // 비회원 주문 정보 (비회원인 경우 필수)
+  isGuest?: boolean;
+  guestEmail?: string;
+  guestPhone?: string;
+  // 비회원 장바구니 아이템 (비회원인 경우 클라이언트에서 전달)
+  guestCartItems?: GuestCartItemInput[];
+}
+
+/**
+ * 비회원 장바구니 아이템 입력 타입
+ * 주문 생성 시 클라이언트에서 전달
+ */
+export interface GuestCartItemInput {
+  product_id: string;
+  quantity: number;
 }
 
 /**
@@ -98,5 +118,23 @@ export interface GetOrdersResult {
   success: boolean;
   message?: string;
   orders?: Order[];
+}
+
+/**
+ * 비회원 주문 조회 입력 타입
+ */
+export interface GuestOrderLookupInput {
+  orderId: string;
+  email?: string;
+  phone?: string;
+}
+
+/**
+ * 비회원 주문 조회 결과 타입
+ */
+export interface GuestOrderLookupResult {
+  success: boolean;
+  message?: string;
+  order?: Order;
 }
 

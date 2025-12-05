@@ -1,3 +1,18 @@
+/**
+ * @file app/globals.css
+ * @description 쇼핑몰 디자인 시스템
+ *
+ * 색상 팔레트:
+ * - Primary (Blue): #00A2FF - CTA 버튼, 가격, 배지
+ * - Primary Hover: #33B5FF
+ * - Dark Navy: #1e1e27 - 텍스트
+ * - Light Purple: #b5aec4 - 호버 효과, 보조 텍스트
+ * - Light Gray: #f2f2f2, #f3f3f3 - 배경
+ * - Border Gray: #ebebeb - 테두리
+ *
+ * 폰트: Poppins (next/font를 통해 로드됨)
+ */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -6,8 +21,20 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-poppins);
   --font-mono: var(--font-geist-mono);
+  
+  /* Coloshop 커스텀 색상 */
+  --color-colo-primary: var(--colo-primary);
+  --color-colo-primary-hover: var(--colo-primary-hover);
+  --color-colo-dark: var(--colo-dark);
+  --color-colo-purple: var(--colo-purple);
+  --color-colo-gray: var(--colo-gray);
+  --color-colo-gray-light: var(--colo-gray-light);
+  --color-colo-border: var(--colo-border);
+  --color-colo-green: var(--colo-green);
+  
+  /* 기존 shadcn 색상 */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -45,79 +72,253 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* 커스텀 색상 팔레트 */
+  --colo-primary: #00A2FF;
+  --colo-primary-hover: #33B5FF;
+  --colo-dark: #1e1e27;
+  --colo-purple: #b5aec4;
+  --colo-gray: #f2f2f2;
+  --colo-gray-light: #f3f3f3;
+  --colo-border: #ebebeb;
+  --colo-green: #51a042;
+  
+  /* Poppins 폰트 */
+  --font-poppins: 'Poppins', sans-serif;
+  
+  /* 스타일 적용 */
+  --background: #ffffff;
+  --foreground: #1e1e27;
+  --card: #ffffff;
+  --card-foreground: #1e1e27;
+  --popover: #ffffff;
+  --popover-foreground: #1e1e27;
+  --primary: #00A2FF;
+  --primary-foreground: #ffffff;
+  --secondary: #1e1e27;
+  --secondary-foreground: #ffffff;
+  --muted: #f2f2f2;
+  --muted-foreground: #51545f;
+  --accent: #f2f2f2;
+  --accent-foreground: #1e1e27;
+  --destructive: #ef4444;
+  --border: #ebebeb;
+  --input: #ebebeb;
+  --ring: #00A2FF;
+  --chart-1: #00A2FF;
+  --chart-2: #51a042;
+  --chart-3: #1e1e27;
+  --chart-4: #b5aec4;
+  --chart-5: #f2f2f2;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1e1e27;
+  --sidebar-primary: #00A2FF;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2f2f2;
+  --sidebar-accent-foreground: #1e1e27;
+  --sidebar-border: #ebebeb;
+  --sidebar-ring: #00A2FF;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* 다크모드 커스텀 색상 */
+  --colo-primary: #00A2FF;
+  --colo-primary-hover: #33B5FF;
+  --colo-dark: #f5f5f5;
+  --colo-purple: #c4bdd4;
+  --colo-gray: #1e1e27;
+  --colo-gray-light: #2a2a35;
+  --colo-border: #3a3a45;
+  --colo-green: #6bc55a;
+  
+  --background: #0f0f12;
+  --foreground: #f5f5f5;
+  --card: #1a1a20;
+  --card-foreground: #f5f5f5;
+  --popover: #1a1a20;
+  --popover-foreground: #f5f5f5;
+  --primary: #00A2FF;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2a35;
+  --secondary-foreground: #f5f5f5;
+  --muted: #2a2a35;
+  --muted-foreground: #a0a0a8;
+  --accent: #2a2a35;
+  --accent-foreground: #f5f5f5;
+  --destructive: #ef4444;
+  --border: #3a3a45;
+  --input: #3a3a45;
+  --ring: #00A2FF;
+  --chart-1: #00A2FF;
+  --chart-2: #6bc55a;
+  --chart-3: #f5f5f5;
+  --chart-4: #c4bdd4;
+  --chart-5: #2a2a35;
+  --sidebar: #1a1a20;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #00A2FF;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2a35;
+  --sidebar-accent-foreground: #f5f5f5;
+  --sidebar-border: #3a3a45;
+  --sidebar-ring: #00A2FF;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  html {
+    font-family: var(--font-poppins);
   }
-  /* main 스타일은 각 페이지에서 개별적으로 정의 */
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-poppins);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  
+  h1 { font-size: 72px; }
+  h2 { font-size: 40px; }
+  h3 { font-size: 28px; }
+  h4 { font-size: 24px; }
+  h5 { font-size: 16px; }
+  h6 { font-size: 14px; }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  /* 선택 영역 스타일 */
+  ::selection {
+    background: #fde0db;
+    color: #fe4c50;
+  }
+}
+
+@layer components {
+  /* Coloshop 빨간 버튼 스타일 */
+  .btn-colo-primary {
+    @apply inline-flex items-center justify-center px-6 h-10 bg-colo-primary text-white font-medium uppercase text-sm rounded transition-all duration-300;
+  }
+  
+  .btn-colo-primary:hover {
+    @apply bg-colo-primary-hover;
+  }
+  
+  /* Coloshop 다크 버튼 스타일 */
+  .btn-colo-secondary {
+    @apply inline-flex items-center justify-center px-6 h-10 bg-colo-dark text-white font-medium uppercase text-sm rounded transition-all duration-300;
+  }
+  
+  .btn-colo-secondary:hover {
+    @apply opacity-90;
+  }
+  
+  /* 섹션 타이틀 스타일 */
+  .section-title {
+    @apply relative inline-block text-center;
+  }
+  
+  .section-title::after {
+    content: '';
+    @apply block absolute left-1/2 -translate-x-1/2 w-15 h-1.5 bg-colo-primary;
+    top: calc(100% + 13px);
+  }
+  
+  /* 상품 카드 호버 효과 */
+  .product-card-hover {
+    @apply transition-all duration-300;
+  }
+  
+  .product-card-hover:hover {
+    @apply shadow-lg;
+    box-shadow: 0 25px 29px rgba(63, 78, 100, 0.15);
+  }
+  
+  /* 상품 배지 스타일 */
+  .product-badge {
+    @apply absolute top-4 px-3 py-1 rounded text-xs font-semibold text-white uppercase;
+  }
+  
+  .product-badge-sale {
+    @apply bg-colo-primary right-4;
+  }
+  
+  .product-badge-new {
+    @apply bg-colo-green left-4;
+  }
+  
+  /* 찜하기 아이콘 */
+  .favorite-icon {
+    @apply absolute top-4 right-4 w-5 h-5 text-colo-purple opacity-0 transition-opacity duration-300 cursor-pointer;
+  }
+  
+  .product-card-hover:hover .favorite-icon {
+    @apply opacity-100;
+  }
+  
+  .favorite-icon:hover,
+  .favorite-icon.active {
+    @apply text-colo-primary;
+  }
+  
+  /* 카테고리 배너 오버레이 */
+  .banner-overlay {
+    @apply absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300;
+  }
+  
+  .banner-item:hover .banner-overlay {
+    @apply opacity-100;
+  }
+  
+  /* 뉴스레터 입력 스타일 */
+  .newsletter-input {
+    @apply w-full md:w-[300px] h-12 bg-white border-none px-5 text-sm placeholder:text-colo-purple focus:ring-1 focus:ring-gray-400;
+  }
+  
+  .newsletter-btn {
+    @apply w-full md:w-40 h-12 bg-colo-primary text-white font-medium uppercase text-sm transition-colors duration-300;
+  }
+  
+  .newsletter-btn:hover {
+    @apply bg-colo-primary-hover;
+  }
+  
+  /* 트랜지션 유틸리티 */
+  .trans-200 {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .trans-300 {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .trans-400 {
+    @apply transition-all duration-400 ease-in-out;
+  }
+  
+  .trans-500 {
+    @apply transition-all duration-500 ease-in-out;
+  }
+}
+
+@layer utilities {
+  /* 커스텀 유틸리티 */
+  .w-15 {
+    width: 60px;
+  }
+  
+  .h-1\.5 {
+    height: 5px;
+  }
+  
+  /* 텍스트 그림자 (가독성) */
+  .text-smooth {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-shadow: rgba(0,0,0,.01) 0 0 1px;
+    text-shadow: rgba(0,0,0,.01) 0 0 1px;
+  }
 }
