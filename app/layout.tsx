@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SaaS 템플릿",
-  description: "Next.js + Clerk + Supabase 보일러플레이트",
+  title: "모두쇼핑",
+  description: "간편하고 빠른 온라인 쇼핑몰",
 };
 
 export default function RootLayout({

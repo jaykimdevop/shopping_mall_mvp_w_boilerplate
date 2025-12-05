@@ -1,0 +1,354 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - link "모두쇼핑" [ref=e3] [cursor=pointer]:
+      - /url: /
+    - button "로그인" [ref=e5]
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - heading "쇼핑몰에 오신 것을 환영합니다" [level=1] [ref=e9]
+      - paragraph [ref=e10]: 다양한 상품을 만나보세요
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - heading "카테고리" [level=2] [ref=e13]
+        - paragraph [ref=e14]: 원하는 카테고리를 선택하세요
+      - generic [ref=e15]:
+        - link "전자제품 5개" [ref=e16] [cursor=pointer]:
+          - /url: /products?category=electronics
+          - generic [ref=e17]:
+            - img [ref=e19]
+            - heading "전자제품" [level=3] [ref=e21]
+            - paragraph [ref=e22]: 5개
+        - link "의류 4개" [ref=e23] [cursor=pointer]:
+          - /url: /products?category=clothing
+          - generic [ref=e24]:
+            - img [ref=e26]
+            - heading "의류" [level=3] [ref=e28]
+            - paragraph [ref=e29]: 4개
+        - link "도서 3개" [ref=e30] [cursor=pointer]:
+          - /url: /products?category=books
+          - generic [ref=e31]:
+            - img [ref=e33]
+            - heading "도서" [level=3] [ref=e35]
+            - paragraph [ref=e36]: 3개
+        - link "식품 3개" [ref=e37] [cursor=pointer]:
+          - /url: /products?category=food
+          - generic [ref=e38]:
+            - img [ref=e40]
+            - heading "식품" [level=3] [ref=e42]
+            - paragraph [ref=e43]: 3개
+        - link "스포츠 2개" [ref=e44] [cursor=pointer]:
+          - /url: /products?category=sports
+          - generic [ref=e45]:
+            - img [ref=e47]
+            - heading "스포츠" [level=3] [ref=e49]
+            - paragraph [ref=e50]: 2개
+        - link "뷰티 2개" [ref=e51] [cursor=pointer]:
+          - /url: /products?category=beauty
+          - generic [ref=e52]:
+            - img [ref=e54]
+            - heading "뷰티" [level=3] [ref=e56]
+            - paragraph [ref=e57]: 2개
+        - link "생활/가정 1개" [ref=e58] [cursor=pointer]:
+          - /url: /products?category=home
+          - generic [ref=e59]:
+            - img [ref=e61]
+            - heading "생활/가정" [level=3] [ref=e63]
+            - paragraph [ref=e64]: 1개
+    - generic [ref=e66]:
+      - generic [ref=e67]:
+        - heading "신상품" [level=2] [ref=e68]
+        - paragraph [ref=e69]: 최근에 등록된 상품을 만나보세요
+      - generic [ref=e71]:
+        - link "electronics 무선 마우스 인체공학적 디자인, 조용한 클릭 ₩35,000 재고 있음" [active] [ref=e73] [cursor=pointer]:
+          - /url: /products/d892d3d3-7bd8-4ffe-bb84-e4142b183f20
+          - img [ref=e76]
+          - generic [ref=e78]:
+            - generic [ref=e79]: electronics
+            - heading "무선 마우스" [level=3] [ref=e80]
+            - paragraph [ref=e81]: 인체공학적 디자인, 조용한 클릭
+            - generic [ref=e83]:
+              - generic [ref=e84]: ₩35,000
+              - generic [ref=e85]: 재고 있음
+        - link "electronics USB-C 멀티 허브 7in1 확장 포트, 4K 지원 ₩52,000 재고 있음" [ref=e87] [cursor=pointer]:
+          - /url: /products/78248b67-30fe-422b-8bce-5ca0fdbff27b
+          - img [ref=e90]
+          - generic [ref=e92]:
+            - generic [ref=e93]: electronics
+            - heading "USB-C 멀티 허브" [level=3] [ref=e94]
+            - paragraph [ref=e95]: 7in1 확장 포트, 4K 지원
+            - generic [ref=e97]:
+              - generic [ref=e98]: ₩52,000
+              - generic [ref=e99]: 재고 있음
+        - link "clothing 면 100% 기본 티셔츠 심플한 디자인, 5가지 컬러 ₩25,000 재고 있음" [ref=e101] [cursor=pointer]:
+          - /url: /products/1c767711-e66e-4843-99e6-bb3323744eca
+          - img [ref=e104]
+          - generic [ref=e106]:
+            - generic [ref=e107]: clothing
+            - heading "면 100% 기본 티셔츠" [level=3] [ref=e108]
+            - paragraph [ref=e109]: 심플한 디자인, 5가지 컬러
+            - generic [ref=e111]:
+              - generic [ref=e112]: ₩25,000
+              - generic [ref=e113]: 재고 있음
+        - link "clothing 후드 집업 자켓 부드러운 안감, 캐주얼 스타일 ₩68,000 재고 있음" [ref=e115] [cursor=pointer]:
+          - /url: /products/48bc6f29-f782-407b-b2ba-726b03f117ec
+          - img [ref=e118]
+          - generic [ref=e120]:
+            - generic [ref=e121]: clothing
+            - heading "후드 집업 자켓" [level=3] [ref=e122]
+            - paragraph [ref=e123]: 부드러운 안감, 캐주얼 스타일
+            - generic [ref=e125]:
+              - generic [ref=e126]: ₩68,000
+              - generic [ref=e127]: 재고 있음
+        - link "clothing 청바지 슬림핏 신축성 좋은 데님, 남녀공용 ₩79,000 재고 있음" [ref=e129] [cursor=pointer]:
+          - /url: /products/ad5b9924-70f1-4542-87da-be3131786df7
+          - img [ref=e132]
+          - generic [ref=e134]:
+            - generic [ref=e135]: clothing
+            - heading "청바지 슬림핏" [level=3] [ref=e136]
+            - paragraph [ref=e137]: 신축성 좋은 데님, 남녀공용
+            - generic [ref=e139]:
+              - generic [ref=e140]: ₩79,000
+              - generic [ref=e141]: 재고 있음
+        - link "clothing 운동용 레깅스 흡수력 좋은 원단, 요가/헬스 ₩42,000 재고 있음" [ref=e143] [cursor=pointer]:
+          - /url: /products/a8a7c093-6ed8-46e3-8a81-44b9e408d0d5
+          - img [ref=e146]
+          - generic [ref=e148]:
+            - generic [ref=e149]: clothing
+            - heading "운동용 레깅스" [level=3] [ref=e150]
+            - paragraph [ref=e151]: 흡수력 좋은 원단, 요가/헬스
+            - generic [ref=e153]:
+              - generic [ref=e154]: ₩42,000
+              - generic [ref=e155]: 재고 있음
+        - link "books 클린 코드 소프트웨어 장인 정신의 바이블 ₩33,000 재고 있음" [ref=e157] [cursor=pointer]:
+          - /url: /products/be468672-1e5d-4bb9-ab95-8982759bdcc2
+          - img [ref=e160]
+          - generic [ref=e162]:
+            - generic [ref=e163]: books
+            - heading "클린 코드" [level=3] [ref=e164]
+            - paragraph [ref=e165]: 소프트웨어 장인 정신의 바이블
+            - generic [ref=e167]:
+              - generic [ref=e168]: ₩33,000
+              - generic [ref=e169]: 재고 있음
+        - link "electronics 무선 블루투스 이어폰 고음질 노이즈 캔슬링 기능, 30시간 재생 ₩89,000 재고 있음" [ref=e171] [cursor=pointer]:
+          - /url: /products/2d711dfc-8867-4894-9a0f-337fcd224f9a
+          - img [ref=e174]
+          - generic [ref=e176]:
+            - generic [ref=e177]: electronics
+            - heading "무선 블루투스 이어폰" [level=3] [ref=e178]
+            - paragraph [ref=e179]: 고음질 노이즈 캔슬링 기능, 30시간 재생
+            - generic [ref=e181]:
+              - generic [ref=e182]: ₩89,000
+              - generic [ref=e183]: 재고 있음
+    - generic [ref=e184]:
+      - generic [ref=e185]:
+        - heading "전체 상품" [level=2] [ref=e186]
+        - paragraph [ref=e187]: 모든 상품을 둘러보세요
+      - generic [ref=e188]:
+        - link "electronics 무선 블루투스 이어폰 고음질 노이즈 캔슬링 기능, 30시간 재생 ₩89,000 재고 있음" [ref=e189] [cursor=pointer]:
+          - /url: /products/2d711dfc-8867-4894-9a0f-337fcd224f9a
+          - img [ref=e192]
+          - generic [ref=e194]:
+            - generic [ref=e195]: electronics
+            - heading "무선 블루투스 이어폰" [level=3] [ref=e196]
+            - paragraph [ref=e197]: 고음질 노이즈 캔슬링 기능, 30시간 재생
+            - generic [ref=e199]:
+              - generic [ref=e200]: ₩89,000
+              - generic [ref=e201]: 재고 있음
+        - link "electronics 무선 마우스 인체공학적 디자인, 조용한 클릭 ₩35,000 재고 있음" [ref=e202] [cursor=pointer]:
+          - /url: /products/d892d3d3-7bd8-4ffe-bb84-e4142b183f20
+          - img [ref=e205]
+          - generic [ref=e207]:
+            - generic [ref=e208]: electronics
+            - heading "무선 마우스" [level=3] [ref=e209]
+            - paragraph [ref=e210]: 인체공학적 디자인, 조용한 클릭
+            - generic [ref=e212]:
+              - generic [ref=e213]: ₩35,000
+              - generic [ref=e214]: 재고 있음
+        - link "electronics USB-C 멀티 허브 7in1 확장 포트, 4K 지원 ₩52,000 재고 있음" [ref=e215] [cursor=pointer]:
+          - /url: /products/78248b67-30fe-422b-8bce-5ca0fdbff27b
+          - img [ref=e218]
+          - generic [ref=e220]:
+            - generic [ref=e221]: electronics
+            - heading "USB-C 멀티 허브" [level=3] [ref=e222]
+            - paragraph [ref=e223]: 7in1 확장 포트, 4K 지원
+            - generic [ref=e225]:
+              - generic [ref=e226]: ₩52,000
+              - generic [ref=e227]: 재고 있음
+        - link "clothing 면 100% 기본 티셔츠 심플한 디자인, 5가지 컬러 ₩25,000 재고 있음" [ref=e228] [cursor=pointer]:
+          - /url: /products/1c767711-e66e-4843-99e6-bb3323744eca
+          - img [ref=e231]
+          - generic [ref=e233]:
+            - generic [ref=e234]: clothing
+            - heading "면 100% 기본 티셔츠" [level=3] [ref=e235]
+            - paragraph [ref=e236]: 심플한 디자인, 5가지 컬러
+            - generic [ref=e238]:
+              - generic [ref=e239]: ₩25,000
+              - generic [ref=e240]: 재고 있음
+        - link "clothing 후드 집업 자켓 부드러운 안감, 캐주얼 스타일 ₩68,000 재고 있음" [ref=e241] [cursor=pointer]:
+          - /url: /products/48bc6f29-f782-407b-b2ba-726b03f117ec
+          - img [ref=e244]
+          - generic [ref=e246]:
+            - generic [ref=e247]: clothing
+            - heading "후드 집업 자켓" [level=3] [ref=e248]
+            - paragraph [ref=e249]: 부드러운 안감, 캐주얼 스타일
+            - generic [ref=e251]:
+              - generic [ref=e252]: ₩68,000
+              - generic [ref=e253]: 재고 있음
+        - link "clothing 청바지 슬림핏 신축성 좋은 데님, 남녀공용 ₩79,000 재고 있음" [ref=e254] [cursor=pointer]:
+          - /url: /products/ad5b9924-70f1-4542-87da-be3131786df7
+          - img [ref=e257]
+          - generic [ref=e259]:
+            - generic [ref=e260]: clothing
+            - heading "청바지 슬림핏" [level=3] [ref=e261]
+            - paragraph [ref=e262]: 신축성 좋은 데님, 남녀공용
+            - generic [ref=e264]:
+              - generic [ref=e265]: ₩79,000
+              - generic [ref=e266]: 재고 있음
+        - link "clothing 운동용 레깅스 흡수력 좋은 원단, 요가/헬스 ₩42,000 재고 있음" [ref=e267] [cursor=pointer]:
+          - /url: /products/a8a7c093-6ed8-46e3-8a81-44b9e408d0d5
+          - img [ref=e270]
+          - generic [ref=e272]:
+            - generic [ref=e273]: clothing
+            - heading "운동용 레깅스" [level=3] [ref=e274]
+            - paragraph [ref=e275]: 흡수력 좋은 원단, 요가/헬스
+            - generic [ref=e277]:
+              - generic [ref=e278]: ₩42,000
+              - generic [ref=e279]: 재고 있음
+        - link "books 클린 코드 소프트웨어 장인 정신의 바이블 ₩33,000 재고 있음" [ref=e280] [cursor=pointer]:
+          - /url: /products/be468672-1e5d-4bb9-ab95-8982759bdcc2
+          - img [ref=e283]
+          - generic [ref=e285]:
+            - generic [ref=e286]: books
+            - heading "클린 코드" [level=3] [ref=e287]
+            - paragraph [ref=e288]: 소프트웨어 장인 정신의 바이블
+            - generic [ref=e290]:
+              - generic [ref=e291]: ₩33,000
+              - generic [ref=e292]: 재고 있음
+        - link "books 이펙티브 타입스크립트 타입스크립트 활용법 62가지 ₩28,000 재고 있음" [ref=e293] [cursor=pointer]:
+          - /url: /products/489f8714-f53d-4416-9e27-d42fd9899520
+          - img [ref=e296]
+          - generic [ref=e298]:
+            - generic [ref=e299]: books
+            - heading "이펙티브 타입스크립트" [level=3] [ref=e300]
+            - paragraph [ref=e301]: 타입스크립트 활용법 62가지
+            - generic [ref=e303]:
+              - generic [ref=e304]: ₩28,000
+              - generic [ref=e305]: 재고 있음
+        - link "books HTTP 완벽 가이드 웹 개발자를 위한 필수서 ₩45,000 재고 있음" [ref=e306] [cursor=pointer]:
+          - /url: /products/2c0b9447-b544-4f16-bae7-a4087ed9cdf9
+          - img [ref=e309]
+          - generic [ref=e311]:
+            - generic [ref=e312]: books
+            - heading "HTTP 완벽 가이드" [level=3] [ref=e313]
+            - paragraph [ref=e314]: 웹 개발자를 위한 필수서
+            - generic [ref=e316]:
+              - generic [ref=e317]: ₩45,000
+              - generic [ref=e318]: 재고 있음
+        - link "food 프리미엄 원두 커피 1kg 산미와 바디감의 균형, 중배전 ₩28,000 재고 있음" [ref=e319] [cursor=pointer]:
+          - /url: /products/95df0959-fdce-4ee9-87d1-0e5767930e27
+          - img [ref=e322]
+          - generic [ref=e324]:
+            - generic [ref=e325]: food
+            - heading "프리미엄 원두 커피 1kg" [level=3] [ref=e326]
+            - paragraph [ref=e327]: 산미와 바디감의 균형, 중배전
+            - generic [ref=e329]:
+              - generic [ref=e330]: ₩28,000
+              - generic [ref=e331]: 재고 있음
+        - link "food 유기농 아몬드 500g 무염 로스팅, 신선한 견과 ₩18,000 재고 있음" [ref=e332] [cursor=pointer]:
+          - /url: /products/ded7758c-443d-4427-948b-2eea37316a5a
+          - img [ref=e335]
+          - generic [ref=e337]:
+            - generic [ref=e338]: food
+            - heading "유기농 아몬드 500g" [level=3] [ref=e339]
+            - paragraph [ref=e340]: 무염 로스팅, 신선한 견과
+            - generic [ref=e342]:
+              - generic [ref=e343]: ₩18,000
+              - generic [ref=e344]: 재고 있음
+        - link "food 올리브 오일 엑스트라 버진 스페인 직수입, 요리/샐러드용 ₩35,000 재고 있음" [ref=e345] [cursor=pointer]:
+          - /url: /products/c74a0360-8064-461c-b30d-10ebd8b89226
+          - img [ref=e348]
+          - generic [ref=e350]:
+            - generic [ref=e351]: food
+            - heading "올리브 오일 엑스트라 버진" [level=3] [ref=e352]
+            - paragraph [ref=e353]: 스페인 직수입, 요리/샐러드용
+            - generic [ref=e355]:
+              - generic [ref=e356]: ₩35,000
+              - generic [ref=e357]: 재고 있음
+        - link "sports 요가 매트 10mm 두꺼운 쿠션, 미끄럼 방지 ₩45,000 재고 있음" [ref=e358] [cursor=pointer]:
+          - /url: /products/a1c5b5e4-16d3-402b-a7fd-c59ca7e4c572
+          - img [ref=e361]
+          - generic [ref=e363]:
+            - generic [ref=e364]: sports
+            - heading "요가 매트 10mm" [level=3] [ref=e365]
+            - paragraph [ref=e366]: 두꺼운 쿠션, 미끄럼 방지
+            - generic [ref=e368]:
+              - generic [ref=e369]: ₩45,000
+              - generic [ref=e370]: 재고 있음
+        - link "sports 덤벨 세트 10kg 조절식 무게, 홈트레이닝 ₩85,000 재고 있음" [ref=e371] [cursor=pointer]:
+          - /url: /products/9b23dd4e-cd32-4094-bbf4-d52568b12c26
+          - img [ref=e374]
+          - generic [ref=e376]:
+            - generic [ref=e377]: sports
+            - heading "덤벨 세트 10kg" [level=3] [ref=e378]
+            - paragraph [ref=e379]: 조절식 무게, 홈트레이닝
+            - generic [ref=e381]:
+              - generic [ref=e382]: ₩85,000
+              - generic [ref=e383]: 재고 있음
+        - link "beauty 비타민C 세럼 30ml 피부 톤 개선, 저자극 포뮬러 ₩38,000 재고 있음" [ref=e384] [cursor=pointer]:
+          - /url: /products/23f7813a-12ad-4192-9286-cc40c97e7ec3
+          - img [ref=e387]
+          - generic [ref=e389]:
+            - generic [ref=e390]: beauty
+            - heading "비타민C 세럼 30ml" [level=3] [ref=e391]
+            - paragraph [ref=e392]: 피부 톤 개선, 저자극 포뮬러
+            - generic [ref=e394]:
+              - generic [ref=e395]: ₩38,000
+              - generic [ref=e396]: 재고 있음
+        - link "beauty 선크림 SPF50+ PA++++ 끈적임 없는 텍스처, 50ml ₩22,000 재고 있음" [ref=e397] [cursor=pointer]:
+          - /url: /products/98598b38-dc46-496e-bc58-6c3cff03ad6c
+          - img [ref=e400]
+          - generic [ref=e402]:
+            - generic [ref=e403]: beauty
+            - heading "선크림 SPF50+ PA++++" [level=3] [ref=e404]
+            - paragraph [ref=e405]: 끈적임 없는 텍스처, 50ml
+            - generic [ref=e407]:
+              - generic [ref=e408]: ₩22,000
+              - generic [ref=e409]: 재고 있음
+        - link "home 디퓨저 세트 천연 에센셜 오일 포함, 200ml ₩32,000 재고 있음" [ref=e410] [cursor=pointer]:
+          - /url: /products/347f9d8d-e44f-4f25-9b13-db102477abe8
+          - img [ref=e413]
+          - generic [ref=e415]:
+            - generic [ref=e416]: home
+            - heading "디퓨저 세트" [level=3] [ref=e417]
+            - paragraph [ref=e418]: 천연 에센셜 오일 포함, 200ml
+            - generic [ref=e420]:
+              - generic [ref=e421]: ₩32,000
+              - generic [ref=e422]: 재고 있음
+        - link "electronics 스마트워치 프로 건강 모니터링 및 운동 추적 기능 ₩320,000 재고 있음" [ref=e423] [cursor=pointer]:
+          - /url: /products/19851d2c-4ca5-4a93-b989-58905834fbd3
+          - img [ref=e426]
+          - generic [ref=e428]:
+            - generic [ref=e429]: electronics
+            - heading "스마트워치 프로" [level=3] [ref=e430]
+            - paragraph [ref=e431]: 건강 모니터링 및 운동 추적 기능
+            - generic [ref=e433]:
+              - generic [ref=e434]: ₩320,000
+              - generic [ref=e435]: 재고 있음
+        - link "electronics 휴대용 보조배터리 20000mAh 고속 충전 지원, 3개 포트 ₩45,000 재고 있음" [ref=e436] [cursor=pointer]:
+          - /url: /products/68b3b8eb-9f4a-467a-9536-3287eeb063c5
+          - img [ref=e439]
+          - generic [ref=e441]:
+            - generic [ref=e442]: electronics
+            - heading "휴대용 보조배터리 20000mAh" [level=3] [ref=e443]
+            - paragraph [ref=e444]: 고속 충전 지원, 3개 포트
+            - generic [ref=e446]:
+              - generic [ref=e447]: ₩45,000
+              - generic [ref=e448]: 재고 있음
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e454] [cursor=pointer]:
+    - img [ref=e455]
+  - alert [ref=e458]
+```
