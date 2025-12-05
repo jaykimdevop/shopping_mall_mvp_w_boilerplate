@@ -3,8 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { koKR } from "@clerk/localizations";
 import { Poppins, Geist_Mono } from "next/font/google";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { ConditionalLayout } from "@/components/conditional-layout";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -106,9 +105,7 @@ export default function RootLayout({
           style={{ fontFamily: "var(--font-poppins)" }}
         >
           <SyncUserProvider>
-            <Navbar />
-            <main className="min-h-[calc(100vh-80px)]">{children}</main>
-            <Footer />
+            <ConditionalLayout>{children}</ConditionalLayout>
             <Toaster />
           </SyncUserProvider>
         </body>

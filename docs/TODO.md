@@ -123,11 +123,21 @@
 
 ## 4차 업데이트: 관리자 페이지 & 코드 정리
 
-- [ ] Phase 16: 관리자 인증 및 권한 시스템
-  - [ ] Clerk 메타데이터를 활용한 관리자 역할 정의 (`role: admin`)
-  - [ ] 관리자 전용 미들웨어 가드 생성 (`middleware.ts` 확장)
-  - [ ] 관리자 레이아웃 생성 (`app/admin/layout.tsx`)
-  - [ ] 관리자 접근 권한 체크 훅 생성 (`hooks/use-admin.ts`)
+- [x] Phase 16: 관리자 인증 및 권한 시스템
+  - [x] Clerk publicMetadata를 활용한 관리자 역할 정의 (`role: admin`)
+    - 관리자 설정: Clerk Dashboard > Users > publicMetadata에 `{ "role": "admin" }` 추가
+  - [x] 관리자 전용 미들웨어 가드 생성 (`middleware.ts` - 로그인 필수)
+  - [x] 관리자 레이아웃 생성 (`app/admin/layout.tsx`)
+    - 서버 컴포넌트에서 `currentUser()`로 `publicMetadata.role` 직접 확인
+    - 사이드바 네비게이션 (대시보드, 상품/주문/배너/회원/배송 관리)
+    - 사이드바 하단: 사용자 프로필(UserButton + 이름/이메일), 테마 토글, 쇼핑몰 바로가기
+  - [x] 관리자 접근 권한 체크 훅 생성 (`hooks/use-admin.ts`)
+  - [x] 관리자 대시보드 페이지 생성 (`app/admin/page.tsx`) - 기본 구조
+  - [x] Navbar에 관리자 대시보드 버튼 추가 (관리자만 표시)
+  - [x] 로그인/회원가입 페이지 생성 (`app/sign-in`, `app/sign-up`)
+  - [x] 사용자 타입 정의 (`types/user.ts`)
+  - [x] 조건부 레이아웃 컴포넌트 생성 (`components/conditional-layout.tsx`)
+    - `/admin` 경로에서 Navbar/Footer 숨김 처리
 
 - [ ] Phase 17: 관리자 대시보드
   - [ ] 대시보드 메인 페이지 (`app/admin/page.tsx`)

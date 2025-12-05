@@ -59,6 +59,13 @@ pnpm lint
    - `components/providers/sync-user-provider.tsx`: RootLayout에서 자동 실행
    - `app/api/sync-user/route.ts`: 실제 동기화 로직 (API 라우트)
 
+4. **관리자 권한 시스템**:
+   - `types/user.ts`: 사용자 역할 타입 정의 (USER_ROLES, UserRole)
+   - `hooks/use-admin.ts`: 관리자 권한 확인 훅 (useAdmin) - Clerk publicMetadata.role 사용
+   - `middleware.ts`: /admin/* 경로 보호 (Clerk publicMetadata.role 확인)
+   - `app/admin/layout.tsx`: 관리자 전용 레이아웃 (사이드바 포함)
+   - **관리자 설정 방법**: Clerk Dashboard > Users > 대상 사용자 > Metadata > Public metadata에 `{ "role": "admin" }` 추가
+
 ### Directory Convention
 
 프로젝트 파일은 `app` 외부에 저장:
@@ -118,6 +125,7 @@ supabase/migrations/20241030014800_create_users_table.sql
   - `name`: TEXT
   - `created_at`: TIMESTAMP
   - RLS: 개발 중 비활성화 (프로덕션에서는 활성화 필요)
+  - 참고: 사용자 역할(role)은 Clerk publicMetadata에서 관리
 
 #### Storage 버킷
 

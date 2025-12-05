@@ -6,6 +6,7 @@
  * - 상단 바: 프로모션 메시지, 언어/계정 드롭다운 (다크 배경)
  * - 메인 내비: 로고, 메뉴, 검색/사용자/장바구니 아이콘
  * - 모바일 햄버거 메뉴
+ * - 관리자: 관리자 대시보드 버튼 (관리자만 표시)
  */
 
 "use client";
@@ -13,10 +14,11 @@
 import { useState } from "react";
 import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { Search, User, Menu, X, Package, ChevronDown, Globe } from "lucide-react";
+import { Search, User, Menu, X, Package, ChevronDown, Globe, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CartBadge from "@/components/cart-badge";
 import ThemeToggle from "@/components/theme-toggle";
+import { useAdmin } from "@/hooks/use-admin";
 
 const navLinks = [
   { href: "/", label: "홈" },
@@ -28,6 +30,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAdmin, isLoaded } = useAdmin();
 
   return (
     <header className="fixed top-0 left-0 w-full bg-background z-50 trans-300">
@@ -118,6 +121,18 @@ const Navbar = () => {
                   </li>
                 </ul>
               </div>
+
+              {/* 관리자 대시보드 버튼 (관리자만 표시) */}
+              {isLoaded && isAdmin && (
+                <Link
+                  href="/admin"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-[#1e1e27] hover:bg-[#2a2a35] rounded-md trans-300"
+                  title="관리자 대시보드"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>관리자</span>
+                </Link>
+              )}
 
               {/* Clerk 사용자 버튼 */}
               <SignedIn>
@@ -221,6 +236,16 @@ const Navbar = () => {
                 >
                   주문내역
                 </Link>
+                {/* 관리자 대시보드 링크 (관리자만 표시) */}
+                {isLoaded && isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="text-sm text-primary font-medium hover:text-primary/80 trans-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    관리자 대시보드
+                  </Link>
+                )}
               </div>
             </SignedIn>
           </div>
