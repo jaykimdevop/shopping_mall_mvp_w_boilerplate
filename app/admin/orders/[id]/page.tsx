@@ -20,8 +20,11 @@ import {
   Calendar,
   FileText,
   Save,
+  Truck,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -44,8 +47,9 @@ import {
   updateOrderStatus,
   updateOrderNote,
 } from "@/actions/admin/order";
-import type { OrderStatus, OrderWithCustomer, ShippingAddress } from "@/types/order";
-import { ORDER_STATUS_LABELS, ORDER_STATUS_LIST } from "@/types/order";
+import type { OrderStatus, OrderWithCustomer, ShippingAddress, ShippingCarrier } from "@/types/order";
+import { ORDER_STATUS_LABELS, ORDER_STATUS_LIST, SHIPPING_CARRIER_LABELS, SHIPPING_CARRIERS, SHIPPING_TRACKING_URLS } from "@/types/order";
+import { updateTrackingNumber, markAsDelivered, removeTrackingNumber } from "@/actions/admin/shipping";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -59,6 +63,12 @@ export default function AdminOrderDetailPage() {
   const [note, setNote] = useState("");
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  // 배송 정보 입력 상태
+  const [isEditingTracking, setIsEditingTracking] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [shippingCarrier, setShippingCarrier] = useState<ShippingCarrier>("cj");
+  const [isSavingTracking, setIsSavingTracking] = useState(false);
 
   // 주문 데이터 로드
   const loadOrder = useCallback(async () => {
@@ -115,6 +125,85 @@ export default function AdminOrderDetailPage() {
     } finally {
       setIsSavingNote(false);
     }
+  };
+
+  // 운송장 번호 저장 핸들러
+  const handleSaveTracking = async () => {
+    if (!order || !trackingNumber.trim()) {
+      toast.error("운송장 번호를 입력해주세요.");
+      return;
+    }
+
+    setIsSavingTracking(true);
+    try {
+      const result = await updateTrackingNumber(order.id, trackingNumber.trim(), shippingCarrier);
+      if (result.success) {
+        toast.success("운송장 번호가 저장되었습니다.");
+        setIsEditingTracking(false);
+        loadOrder();
+      } else {
+        toast.error(result.message || "운송장 번호 저장에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Failed to save tracking:", error);
+      toast.error("운송장 번호 저장에 실패했습니다.");
+    } finally {
+      setIsSavingTracking(false);
+    }
+  };
+
+  // 운송장 번호 삭제 핸들러
+  const handleRemoveTracking = async () => {
+    if (!order) return;
+
+    if (!confirm("운송장 번호를 삭제하시겠습니까? 배송 상태가 '주문 확정'으로 변경됩니다.")) {
+      return;
+    }
+
+    try {
+      const result = await removeTrackingNumber(order.id);
+      if (result.success) {
+        toast.success("운송장 번호가 삭제되었습니다.");
+        loadOrder();
+      } else {
+        toast.error(result.message || "운송장 번호 삭제에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Failed to remove tracking:", error);
+      toast.error("운송장 번호 삭제에 실패했습니다.");
+    }
+  };
+
+  // 배송 완료 처리 핸들러
+  const handleMarkAsDelivered = async () => {
+    if (!order) return;
+
+    try {
+      const result = await markAsDelivered(order.id);
+      if (result.success) {
+        toast.success("배송 완료 처리되었습니다.");
+        loadOrder();
+      } else {
+        toast.error(result.message || "배송 완료 처리에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Failed to mark as delivered:", error);
+      toast.error("배송 완료 처리에 실패했습니다.");
+    }
+  };
+
+  // 배송 조회 URL 생성
+  const getTrackingUrl = (carrier: ShippingCarrier, trackingNum: string) => {
+    const urlTemplate = SHIPPING_TRACKING_URLS[carrier];
+    if (!urlTemplate) return null;
+    return urlTemplate.replace("{trackingNumber}", trackingNum);
+  };
+
+  // 운송장 입력 모드 시작
+  const startEditingTracking = () => {
+    setTrackingNumber(order?.tracking_number || "");
+    setShippingCarrier((order?.shipping_carrier as ShippingCarrier) || "cj");
+    setIsEditingTracking(true);
   };
 
   // 주문번호 포맷
@@ -381,6 +470,150 @@ export default function AdminOrderDetailPage() {
                   </p>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* 배송 정보 */}
+          <div className="rounded-lg border bg-white p-6 dark:bg-gray-800 dark:border-gray-700">
+            <div className="flex items-center gap-2 mb-4">
+              <Truck className="h-5 w-5 text-gray-500" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                배송 정보
+              </h3>
+            </div>
+
+            <div className="space-y-4">
+              {/* 운송장 번호 입력/표시 */}
+              {isEditingTracking ? (
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      배송 업체
+                    </p>
+                    <Select
+                      value={shippingCarrier}
+                      onValueChange={(v) => setShippingCarrier(v as ShippingCarrier)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SHIPPING_CARRIERS.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {SHIPPING_CARRIER_LABELS[c]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      운송장 번호
+                    </p>
+                    <Input
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                      placeholder="운송장 번호 입력"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditingTracking(false)}
+                      disabled={isSavingTracking}
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveTracking}
+                      disabled={isSavingTracking}
+                      className="bg-[#00A2FF] hover:bg-[#0090e0]"
+                    >
+                      {isSavingTracking ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "저장"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : order.tracking_number ? (
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">배송 업체</p>
+                    <p className="font-medium">
+                      {order.shipping_carrier
+                        ? SHIPPING_CARRIER_LABELS[order.shipping_carrier as ShippingCarrier]
+                        : "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">운송장 번호</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-mono">{order.tracking_number}</p>
+                      {order.shipping_carrier && (
+                        <a
+                          href={getTrackingUrl(order.shipping_carrier as ShippingCarrier, order.tracking_number) || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00A2FF] hover:underline"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  {order.shipped_at && (
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">배송 시작일</p>
+                      <p>{formatDate(order.shipped_at)}</p>
+                    </div>
+                  )}
+                  {order.delivered_at && (
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">배송 완료일</p>
+                      <p>{formatDate(order.delivered_at)}</p>
+                    </div>
+                  )}
+                  {/* 배송 중 상태일 때만 액션 버튼 표시 */}
+                  {order.status === "shipped" && (
+                    <div className="flex gap-2 pt-2 border-t dark:border-gray-700">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveTracking}
+                      >
+                        운송장 삭제
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleMarkAsDelivered}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        배송 완료
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    운송장 정보가 없습니다.
+                  </p>
+                  {/* confirmed 상태일 때만 운송장 입력 버튼 표시 */}
+                  {order.status === "confirmed" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={startEditingTracking}
+                    >
+                      운송장 입력
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

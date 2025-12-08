@@ -277,19 +277,30 @@
   - [x] 사용자 동기화 업데이트 (`app/api/sync-user/route.ts`)
     - 이메일 필드 동기화 추가
 
-- [ ] Phase 22: 배송 관리 페이지
-  - [ ] DB 스키마 수정: `orders` 테이블에 배송 관련 컬럼 추가
+- [x] Phase 22: 배송 관리 페이지
+  - [x] DB 스키마 수정: `orders` 테이블에 배송 관련 컬럼 추가
     - `tracking_number` (운송장 번호)
     - `shipping_carrier` (배송 업체)
     - `shipped_at`, `delivered_at` (배송/도착 일시)
-  - [ ] 배송 목록 페이지 (`app/admin/shipping/page.tsx`)
+    - 마이그레이션 파일: `supabase/migrations/20251208100000_add_shipping_columns.sql`
+  - [x] 배송 목록 페이지 (`app/admin/shipping/page.tsx`)
     - 배송 상태별 필터링 (배송 대기, 배송 중, 배송 완료)
-    - 운송장 번호 일괄 입력 기능
-  - [ ] 배송 상세/수정 기능
-    - 운송장 번호 입력
+    - 검색 (주문번호, 수령인명, 운송장 번호)
+    - 배송 업체별 필터, 날짜 범위 필터
+    - 인라인 운송장 번호 입력
+    - 운송장 번호 일괄 입력 기능 (`components/admin/bulk-tracking-modal.tsx`)
+  - [x] 배송 상세/수정 기능
+    - 운송장 번호 입력/삭제 (`app/admin/orders/[id]/page.tsx` 배송 정보 섹션 추가)
     - 배송 상태 변경 (shipped → delivered)
-  - [ ] 배송 Server Actions 생성 (`actions/admin/shipping.ts`)
-    - `getShippingList`, `updateTrackingNumber`, `updateShippingStatus`, `bulkUpdateTracking`
+    - 배송 조회 링크 (각 택배사 조회 페이지 연결)
+  - [x] 배송 Server Actions 생성 (`actions/admin/shipping.ts`)
+    - `getShippingList`, `getShippingStatusCounts`
+    - `updateTrackingNumber`, `bulkUpdateTracking`, `removeTrackingNumber`
+    - `markAsDelivered`, `cancelDelivery`
+  - [x] 타입 정의 확장 (`types/order.ts`)
+    - `ShippingCarrier`, `SHIPPING_CARRIERS`, `SHIPPING_CARRIER_LABELS`
+    - `SHIPPING_TRACKING_URLS` (배송 조회 URL 패턴)
+    - `ShippingStatus`, `AdminShippingQueryOptions`, `ShippingOrder`
 
 - [ ] Phase 23: 코드 정리 및 최적화
   - [ ] 디버깅 로그 정리 (`actions/cart.ts`, `actions/order.ts`)
