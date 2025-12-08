@@ -138,3 +138,71 @@ export interface GuestOrderLookupResult {
   order?: Order;
 }
 
+// ============================================================================
+// 관리자 주문 관리 타입
+// ============================================================================
+
+/**
+ * 관리자 주문 목록 조회 옵션
+ */
+export interface AdminOrderQueryOptions {
+  search?: string; // 주문번호, 고객명, 이메일 검색
+  status?: OrderStatus | "all";
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
+  sortBy?: "created_at" | "total_amount";
+  sortOrder?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * 고객 정보 포함 주문 타입 (관리자용)
+ */
+export interface OrderWithCustomer extends Order {
+  customer_name?: string | null;
+  customer_email?: string | null;
+}
+
+/**
+ * 페이지네이션된 주문 목록 응답 타입
+ */
+export interface PaginatedOrdersResponse {
+  orders: OrderWithCustomer[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+/**
+ * 주문 상태 변경 결과 타입
+ */
+export interface UpdateOrderStatusResult {
+  success: boolean;
+  message?: string;
+  order?: Order;
+}
+
+/**
+ * 주문 상태 한글 라벨
+ */
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: "결제 대기",
+  confirmed: "주문 확정",
+  shipped: "배송 중",
+  delivered: "배송 완료",
+  cancelled: "주문 취소",
+};
+
+/**
+ * 주문 상태 목록 (필터용)
+ */
+export const ORDER_STATUS_LIST: OrderStatus[] = [
+  "pending",
+  "confirmed",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
+

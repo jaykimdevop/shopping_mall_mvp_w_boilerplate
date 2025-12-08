@@ -8,8 +8,13 @@ import { getServiceRoleClient } from "@/lib/supabase/service-role";
  * 클라이언트에서 로그인 후 이 API를 호출하여 사용자 정보를 Supabase에 저장합니다.
  * 이미 존재하는 경우 업데이트하고, 없으면 새로 생성합니다.
  *
+ * 동기화되는 정보:
+ * - clerk_id: Clerk 사용자 ID
+ * - name: 사용자 이름 (fullName > username > email)
+ * - email: 사용자 이메일 주소
+ *
  * 참고: 사용자 역할(role)은 Clerk publicMetadata에서 관리합니다.
- * Supabase users 테이블에는 기본 정보(clerk_id, name)만 저장합니다.
+ * 사용자 등급(tier)은 Supabase users 테이블에서 관리합니다.
  */
 export async function POST() {
   try {
@@ -28,6 +33,11 @@ export async function POST() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // 이메일 주소 추출
+    const primaryEmail = clerkUser.emailAddresses.find(
+      (email) => email.id === clerkUser.primaryEmailAddressId
+    )?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress || null;
+
     // Supabase에 사용자 정보 동기화
     const supabase = getServiceRoleClient();
 
@@ -39,8 +49,9 @@ export async function POST() {
           name:
             clerkUser.fullName ||
             clerkUser.username ||
-            clerkUser.emailAddresses[0]?.emailAddress ||
+            primaryEmail ||
             "Unknown",
+          email: primaryEmail,
         },
         {
           onConflict: "clerk_id",

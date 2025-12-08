@@ -11,6 +11,7 @@
 
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { createPublicSupabaseClient } from "@/lib/supabase/server-public";
 import type { Product } from "@/types/product";
 import { getCategoryName } from "@/types/category";
@@ -138,21 +139,32 @@ async function ProductDetail({ productId }: { productId: string }) {
           <div className="space-y-4">
             {/* 메인 이미지 */}
             <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                <svg
-                  className="w-24 h-24"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
+              {typedProduct.image_url ? (
+                <Image
+                  src={typedProduct.image_url}
+                  alt={typedProduct.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  <svg
+                    className="w-24 h-24"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+              )}
 
               {/* 배지 */}
               {typedProduct.stock_quantity < 10 &&
@@ -161,33 +173,20 @@ async function ProductDetail({ productId }: { productId: string }) {
                 )}
             </div>
 
-            {/* 썸네일 갤러리 (플레이스홀더) */}
-            <div className="flex gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className={`w-20 h-20 bg-muted rounded cursor-pointer border-2 trans-300 ${
-                    i === 1 ? "border-primary" : "border-transparent hover:border-colo-purple"
-                  }`}
-                >
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
+            {/* 썸네일 갤러리 - 이미지가 있으면 표시 */}
+            {typedProduct.image_url && (
+              <div className="flex gap-2">
+                <div className="relative w-20 h-20 bg-muted rounded cursor-pointer border-2 border-primary overflow-hidden">
+                  <Image
+                    src={typedProduct.image_url}
+                    alt={typedProduct.name}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* 상품 정보 */}

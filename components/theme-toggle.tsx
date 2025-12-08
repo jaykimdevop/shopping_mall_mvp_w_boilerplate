@@ -10,7 +10,12 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
-export default function ThemeToggle() {
+interface ThemeToggleProps {
+  /** 항상 밝은 색상의 아이콘을 표시 (어두운 배경에서 사용 시) */
+  forceLightIcon?: boolean;
+}
+
+export default function ThemeToggle({ forceLightIcon = false }: ThemeToggleProps) {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -40,11 +45,20 @@ export default function ThemeToggle() {
     }
   };
 
+  // 아이콘 색상 클래스 결정
+  const iconColorClass = forceLightIcon 
+    ? "text-gray-300 hover:text-white" 
+    : "text-foreground hover:text-colo-purple";
+
+  const bgHoverClass = forceLightIcon
+    ? "hover:bg-gray-700"
+    : "hover:bg-muted";
+
   // 마운트 전에는 렌더링하지 않음 (hydration mismatch 방지)
   if (!mounted) {
     return (
       <button
-        className="p-2 text-foreground hover:text-colo-purple trans-300 rounded-full"
+        className={`p-2 ${iconColorClass} trans-300 rounded-full`}
         aria-label="테마 변경"
       >
         <Sun className="w-5 h-5" />
@@ -55,7 +69,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 text-foreground hover:text-colo-purple trans-300 rounded-full hover:bg-muted"
+      className={`p-2 ${iconColorClass} trans-300 rounded-full ${bgHoverClass}`}
       aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
     >
       {isDark ? (

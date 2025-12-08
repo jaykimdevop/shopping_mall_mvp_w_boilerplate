@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Package, Loader2 } from "lucide-react";
@@ -17,17 +17,15 @@ import OrderDetail from "@/components/order-detail";
 import { getGuestOrder } from "@/actions/order";
 import type { Order } from "@/types/order";
 
-export default function GuestOrderCompletePage() {
+function GuestOrderCompleteContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
   
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!orderId) {
-      setError("주문 정보를 찾을 수 없습니다.");
       setIsLoading(false);
       return;
     }
@@ -43,13 +41,11 @@ export default function GuestOrderCompletePage() {
 
         if (result.success && result.order) {
           setOrder(result.order);
-        } else {
-          // 주문을 찾지 못한 경우에도 기본 정보 표시
-          setError(null);
         }
+        // 주문을 찾지 못한 경우에도 기본 정보 표시
       } catch (err) {
         console.error("Failed to fetch order:", err);
-        setError(null); // 에러가 있어도 기본 완료 화면 표시
+        // 에러가 있어도 기본 완료 화면 표시
       } finally {
         setIsLoading(false);
       }
@@ -119,6 +115,18 @@ export default function GuestOrderCompletePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GuestOrderCompletePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    }>
+      <GuestOrderCompleteContent />
+    </Suspense>
   );
 }
 

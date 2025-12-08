@@ -60,11 +60,19 @@ pnpm lint
    - `app/api/sync-user/route.ts`: 실제 동기화 로직 (API 라우트)
 
 4. **관리자 권한 시스템**:
-   - `types/user.ts`: 사용자 역할 타입 정의 (USER_ROLES, UserRole)
+   - `types/user.ts`: 사용자 역할/등급 타입 정의 (USER_ROLES, UserRole, USER_TIERS, UserTier)
    - `hooks/use-admin.ts`: 관리자 권한 확인 훅 (useAdmin) - Clerk publicMetadata.role 사용
    - `middleware.ts`: /admin/* 경로 보호 (Clerk publicMetadata.role 확인)
    - `app/admin/layout.tsx`: 관리자 전용 레이아웃 (사이드바 포함)
    - **관리자 설정 방법**: Clerk Dashboard > Users > 대상 사용자 > Metadata > Public metadata에 `{ "role": "admin" }` 추가
+
+5. **회원 관리 시스템** (Phase 21):
+   - `actions/admin/user.ts`: 회원 관리 Server Actions (getAllUsers, getUserDetail, updateUserRole, updateUserTier)
+   - `app/admin/users/page.tsx`: 회원 목록 페이지 (검색, 필터, 정렬, 페이지네이션)
+   - `app/admin/users/[id]/page.tsx`: 회원 상세 페이지 (기본 정보, 역할/등급 관리, 주문 내역)
+   - `components/admin/user-role-badge.tsx`: 역할 배지 컴포넌트
+   - `components/admin/user-tier-badge.tsx`: 등급 배지 컴포넌트
+   - 역할(role)은 Clerk publicMetadata에서 관리, 등급(tier)은 Supabase users 테이블에서 관리
 
 ### Directory Convention
 
@@ -123,9 +131,12 @@ supabase/migrations/20241030014800_create_users_table.sql
   - `id`: UUID (Primary Key)
   - `clerk_id`: TEXT (Unique, Clerk User ID)
   - `name`: TEXT
+  - `email`: TEXT (Clerk에서 동기화)
+  - `tier`: TEXT (회원 등급: 'normal' | 'vip', default: 'normal')
   - `created_at`: TIMESTAMP
+  - `updated_at`: TIMESTAMP (자동 업데이트 트리거)
   - RLS: 개발 중 비활성화 (프로덕션에서는 활성화 필요)
-  - 참고: 사용자 역할(role)은 Clerk publicMetadata에서 관리
+  - 참고: 사용자 역할(role)은 Clerk publicMetadata에서 관리, 등급(tier)은 이 테이블에서 관리
 
 #### Storage 버킷
 
@@ -137,6 +148,21 @@ supabase/migrations/20241030014800_create_users_table.sql
     - DELETE: 인증된 사용자만 자신의 파일 삭제 가능
     - UPDATE: 인증된 사용자만 자신의 파일 업데이트 가능
   - 정책은 `auth.jwt()->>'sub'` (Clerk user ID)로 사용자 확인
+
+- `banners`: 홈페이지 히어로 슬라이더 배너
+  - `id`, `title`, `subtitle`, `description`
+  - `cta_text`, `cta_link`: CTA 버튼 텍스트 및 링크
+  - `bg_color`: 배경 그라데이션 (Tailwind CSS 클래스)
+  - `image_url`: 배경 이미지 URL
+  - `product_id`: 연결된 상품 ID (FK)
+  - `sort_order`, `is_active`: 정렬 및 활성화 상태
+  - RLS: 개발 중 비활성화
+
+- `generated_images`: AI 생성 이미지 보관
+  - `id`, `product_id`, `image_url`, `prompt`
+  - `image_type`: 'product' | 'banner'
+  - `is_used`: 실제 사용 여부
+  - RLS: 개발 중 비활성화
 
 ## Environment Variables
 
@@ -155,6 +181,9 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_STORAGE_BUCKET=uploads
+
+# Google Gemini API (AI 이미지 생성)
+GEMINI_API_KEY=
 ```
 
 ## Development Guidelines

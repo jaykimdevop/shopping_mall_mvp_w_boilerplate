@@ -139,65 +139,143 @@
   - [x] 조건부 레이아웃 컴포넌트 생성 (`components/conditional-layout.tsx`)
     - `/admin` 경로에서 Navbar/Footer 숨김 처리
 
-- [ ] Phase 17: 관리자 대시보드
-  - [ ] 대시보드 메인 페이지 (`app/admin/page.tsx`)
-  - [ ] 통계 카드 컴포넌트 (총 주문수, 매출, 상품수, 회원수)
-  - [ ] 최근 주문 목록 위젯
-  - [ ] 재고 부족 상품 알림 위젯
-  - [ ] 일별/월별 매출 차트 (선택사항)
+- [x] Phase 17: 관리자 대시보드
+  - [x] 대시보드 메인 페이지 (`app/admin/page.tsx`)
+  - [x] 통계 카드 컴포넌트 (총 주문수, 매출, 상품수, 회원수) - DB 연동 완료
+  - [x] 최근 주문 목록 위젯 - 상태별 배지, 고객명, 금액 표시
+  - [x] 재고 부족 상품 알림 위젯 - 재고 10개 이하 표시, 품절 강조
+  - [x] Server Actions 생성 (`actions/admin/dashboard.ts`)
+  - [ ] 일별/월별 매출 차트 (선택사항 - 추후 구현)
 
-- [ ] Phase 18: 상품 관리 페이지
-  - [ ] DB 스키마 수정: `products` 테이블에 `image_url` 컬럼 추가
-  - [ ] 상품 목록 페이지 (`app/admin/products/page.tsx`)
+- [x] Phase 18: 상품 관리 페이지
+  - [x] DB 스키마 수정: `products` 테이블에 `image_url` 컬럼 추가
+    - 마이그레이션 파일: `supabase/migrations/20251205180000_add_image_url_to_products.sql`
+    - 타입 정의 업데이트: `types/product.ts` (CreateProductInput, UpdateProductInput 등 추가)
+  - [x] 상품 목록 페이지 (`app/admin/products/page.tsx`)
     - 검색, 필터링, 정렬 기능
     - 활성/비활성 상태 토글
     - 일괄 삭제 기능
-  - [ ] 상품 등록 페이지 (`app/admin/products/new/page.tsx`)
+    - 페이지네이션
+  - [x] 상품 등록 페이지 (`app/admin/products/new/page.tsx`)
     - 상품 정보 입력 폼 (react-hook-form + Zod)
     - 이미지 업로드 (Supabase Storage 연동)
-  - [ ] 상품 수정 페이지 (`app/admin/products/[id]/edit/page.tsx`)
-  - [ ] 상품 Server Actions 생성 (`actions/admin/product.ts`)
-    - `createProduct`, `updateProduct`, `deleteProduct`, `toggleProductStatus`
+    - 공통 폼 컴포넌트: `components/admin/product-form.tsx`
+  - [x] 상품 수정 페이지 (`app/admin/products/[id]/edit/page.tsx`)
+  - [x] 상품 Server Actions 생성 (`actions/admin/product.ts`)
+    - `getAdminProducts`, `getProductById`, `getCategories`
+    - `createProduct`, `updateProduct`, `deleteProduct`, `deleteProducts`
+    - `toggleProductStatus`, `uploadProductImage`, `deleteProductImage`
+  - [x] 상품 카드 이미지 표시 업데이트
+    - `components/product-card.tsx`, `components/product-slider.tsx`
+    - `app/products/[id]/page.tsx`
+  - [x] 유틸리티 함수 추가: `lib/utils.ts` - `formatCurrency()`
+  - [x] Next.js 이미지 설정: `next.config.ts` - Supabase Storage 도메인 허용
+  - [x] AI 상품 이미지 생성 기능 (Gemini Imagen API)
+    - [x] Gemini API 클라이언트 설정 (`lib/gemini.ts`)
+    - [x] AI 이미지 생성 Server Actions (`actions/admin/ai-image.ts`)
+    - [x] AI 이미지 생성 공통 UI 컴포넌트 (`components/admin/ai-image-generator.tsx`)
+    - [x] 상품 폼에 "AI로 이미지 생성" 버튼 추가 (`components/admin/product-form.tsx`)
+    - [x] 흰색 배경, 1024x1024px (1:1 정사각형) 이미지 생성
+    - [x] 기본 프롬프트 제공 (관리자가 수정 가능)
+    - [x] 생성된 이미지 `generated_images` 테이블에 보관 (재사용 가능)
+    - [x] 환경변수: `GEMINI_API_KEY`
+    - [x] 다양한 이미지 사이즈 고려 (썸네일, 상품 카드, 상세 페이지)
 
-- [ ] Phase 19: 주문 관리 페이지
-  - [ ] 주문 목록 페이지 (`app/admin/orders/page.tsx`)
+- [x] Phase 19: 주문 관리 페이지
+  - [x] 주문 목록 페이지 (`app/admin/orders/page.tsx`)
     - 상태별 필터링 (pending, confirmed, shipped, delivered, cancelled)
     - 날짜 범위 필터링
-    - 검색 기능 (주문번호, 고객명, 이메일)
-  - [ ] 주문 상세 페이지 (`app/admin/orders/[id]/page.tsx`)
+    - 검색 기능 (주문번호, 고객명)
+    - 정렬 기능 (최신순, 오래된순, 금액순)
+    - 페이지네이션
+  - [x] 주문 상세 페이지 (`app/admin/orders/[id]/page.tsx`)
     - 주문 정보, 배송지, 주문 아이템 표시
     - 주문 상태 변경 기능
-    - 주문 메모 추가 기능
-  - [ ] 주문 Server Actions 생성 (`actions/admin/order.ts`)
-    - `getAllOrders`, `updateOrderStatus`, `cancelOrder`, `addOrderNote`
+    - 주문 메모 추가/수정 기능
+  - [x] 주문 상태 배지 컴포넌트 (`components/admin/order-status-badge.tsx`)
+    - 상태별 색상 구분 (pending: 노랑, confirmed: 파랑, shipped: 보라, delivered: 초록, cancelled: 빨강)
+  - [x] 주문 Server Actions 생성 (`actions/admin/order.ts`)
+    - `getAdminOrders`, `getOrderById`, `updateOrderStatus`, `cancelOrder`, `updateOrderNote`, `getOrderStatusCounts`
+  - [x] 주문 타입 정의 추가 (`types/order.ts`)
+    - `AdminOrderQueryOptions`, `OrderWithCustomer`, `PaginatedOrdersResponse`, `ORDER_STATUS_LABELS`, `ORDER_STATUS_LIST`
 
-- [ ] Phase 20: 배너/슬라이더 관리 페이지
-  - [ ] DB 스키마 생성: `banners` 테이블 (id, title, subtitle, description, cta_text, cta_link, bg_color, image_url, sort_order, is_active)
-  - [ ] 배너 타입 정의 (`types/banner.ts`)
-  - [ ] 배너 목록 페이지 (`app/admin/banners/page.tsx`)
-    - 드래그 앤 드롭 순서 변경
-    - 활성/비활성 상태 토글
-  - [ ] 배너 등록/수정 페이지 (`app/admin/banners/new/page.tsx`, `app/admin/banners/[id]/edit/page.tsx`)
-    - 제목, 부제목, 설명, CTA 버튼 텍스트/링크
-    - 배경색 선택 또는 배경 이미지 업로드
-  - [ ] 배너 Server Actions 생성 (`actions/admin/banner.ts`)
-    - `getBanners`, `createBanner`, `updateBanner`, `deleteBanner`, `reorderBanners`
-  - [ ] 히어로 슬라이더 컴포넌트 수정 (`components/hero-slider.tsx`)
-    - 하드코딩된 데이터 → DB에서 동적으로 로드
+- [x] Phase 20: 배너/슬라이더 관리 페이지 (AI 이미지 생성 포함)
+  - [x] DB 스키마 생성 (`supabase/migrations/20251206000000_create_banners_and_generated_images.sql`)
+    - [x] `banners` 테이블 (id, title, subtitle, description, cta_text, cta_link, bg_color, image_url, product_id, sort_order, is_active)
+    - [x] `generated_images` 테이블 (id, product_id, image_url, prompt, image_type, is_used, created_at)
+    - [x] 인덱스 및 트리거 설정
+    - [x] RLS 비활성화 (개발 환경)
+  - [x] 배너 타입 정의 (`types/banner.ts`)
+    - [x] Banner, CreateBannerInput, UpdateBannerInput, BannerWithProduct
+    - [x] GeneratedImage, GeneratedImageType 타입
+    - [x] 기본 프롬프트 상수 (DEFAULT_PRODUCT_IMAGE_PROMPT, DEFAULT_BANNER_IMAGE_PROMPT)
+    - [x] 이미지 사이즈 상수 (IMAGE_SIZES)
+    - [x] 배경색 프리셋 (BANNER_BG_COLOR_PRESETS)
+  - [x] 배너 목록 페이지 (`app/admin/banners/page.tsx`)
+    - [x] 드래그 앤 드롭 순서 변경 (`banner-list-client.tsx`)
+    - [x] 활성/비활성 상태 토글
+    - [x] 배너 미리보기 (이미지 또는 그라데이션)
+    - [x] 삭제 확인 다이얼로그
+  - [x] 배너 등록/수정 페이지 (`app/admin/banners/new/page.tsx`, `[id]/edit/page.tsx`)
+    - [x] 상품 선택 (검색 기능)
+    - [x] 프로모션 정보 입력 (제목, 부제목, 설명, CTA 버튼)
+    - [x] AI 배너 이미지 생성 기능
+      - [x] "AI로 배너 이미지 생성" 버튼 클릭 시에만 생성 (자동 생성 없음)
+      - [x] 1792x1024px (16:9 가로형) 이미지 생성 (Imagen 3.0)
+      - [x] 기본 프롬프트 제공 (관리자가 수정 가능)
+      - [x] 마음에 들 때까지 재생성 가능
+      - [x] "이 이미지로 확정" 버튼으로 최종 선택
+    - [x] 이전에 생성한 이미지 갤러리에서 재사용 가능
+    - [x] 배경색 선택 옵션 (8가지 그라데이션 프리셋)
+    - [x] 이미지 업로드 기능
+  - [x] 배너 폼 컴포넌트 (`components/admin/banner-form.tsx`)
+  - [x] 배너 Server Actions 생성 (`actions/admin/banner.ts`)
+    - [x] `getBanners`, `getActiveBanners`, `getBannerById`
+    - [x] `createBanner`, `updateBanner`, `deleteBanner`, `deleteBanners`
+    - [x] `reorderBanners`, `toggleBannerStatus`
+    - [x] `uploadBannerImage`, `deleteBannerImage`
+  - [x] 히어로 슬라이더 컴포넌트 수정
+    - [x] `components/hero-slider.tsx` - 서버 컴포넌트로 변경, DB 연동
+    - [x] `components/hero-slider-client.tsx` - 클라이언트 캐러셀 UI
+    - [x] 하드코딩된 데이터 → DB에서 동적으로 로드
+    - [x] 활성화된 배너만 표시, sort_order 순서대로
+    - [x] 배너가 없으면 기본 슬라이드 표시
+    - [x] 이미지 배너 또는 그라데이션 배경 지원
 
-- [ ] Phase 21: 회원 관리 페이지
-  - [ ] 회원 목록 페이지 (`app/admin/users/page.tsx`)
+- [x] Phase 21: 회원 관리 페이지
+  - [x] DB 스키마 수정: `users` 테이블에 회원 등급 관련 컬럼 추가
+    - `email`: TEXT (Clerk에서 동기화)
+    - `tier`: TEXT (회원 등급: 'normal' | 'vip')
+    - `updated_at`: TIMESTAMP (자동 업데이트 트리거)
+    - 마이그레이션 파일: `supabase/migrations/20251208000000_add_user_tier.sql`
+  - [x] 타입 정의 확장 (`types/user.ts`)
+    - `UserTier`, `USER_TIERS`, `USER_TIER_LABELS` 추가
+    - `AdminUser`, `AdminUserDetail`, `AdminUserQueryOptions` 추가
+    - `PaginatedUsersResponse`, `UserOrderStats`, `UserOrderSummary` 추가
+  - [x] 회원 Server Actions 생성 (`actions/admin/user.ts`)
+    - `getAllUsers`: 회원 목록 조회 (Clerk API + Supabase 조인)
+    - `getUserDetail`: 회원 상세 조회 (주문 내역 포함)
+    - `updateUserRole`: 역할 변경 (Clerk publicMetadata 업데이트)
+    - `updateUserTier`: 등급 변경 (Supabase users 테이블 업데이트)
+    - `getUserOrderStats`: 회원별 주문 통계 조회
+    - `getTotalUserCount`, `getUserCountByTier`: 회원 수 통계
+  - [x] 회원 목록 페이지 (`app/admin/users/page.tsx`)
     - Clerk + Supabase users 테이블 연동
-    - 검색, 필터링 (가입일, 주문 횟수 등)
-    - 회원 등급 표시 (일반/VIP)
-  - [ ] 회원 상세 페이지 (`app/admin/users/[id]/page.tsx`)
-    - 회원 기본 정보 (이름, 이메일, 가입일)
-    - 주문 내역 목록
-    - 장바구니 현황
-  - [ ] 회원 역할/등급 관리 기능
-    - Clerk 메타데이터 업데이트 (`role: admin/user`, `tier: vip/normal`)
-  - [ ] 회원 Server Actions 생성 (`actions/admin/user.ts`)
-    - `getAllUsers`, `getUserDetail`, `updateUserRole`, `updateUserTier`
+    - 검색 (이름, 이메일)
+    - 필터링 (역할: 전체/관리자/일반, 등급: 전체/VIP/일반)
+    - 정렬 (가입일순, 이름순, 주문 횟수순, 구매액순)
+    - 페이지네이션 (10개씩)
+    - 역할/등급 인라인 변경 기능
+  - [x] 회원 상세 페이지 (`app/admin/users/[id]/page.tsx`)
+    - 프로필 카드 (이미지, 이름, 이메일, 역할/등급 배지, 가입일, 마지막 로그인)
+    - 통계 카드 (총 주문, 총 구매액, 평균 주문액)
+    - 역할/등급 관리 섹션 (드롭다운으로 변경)
+    - 최근 주문 내역 테이블 (최대 10개, 전체 보기 링크)
+  - [x] UI 컴포넌트 생성
+    - `components/admin/user-role-badge.tsx`: 역할 배지 (관리자: 보라색, 일반: 회색)
+    - `components/admin/user-tier-badge.tsx`: 등급 배지 (VIP: 금색, 일반: 테두리만)
+  - [x] 사용자 동기화 업데이트 (`app/api/sync-user/route.ts`)
+    - 이메일 필드 동기화 추가
 
 - [ ] Phase 22: 배송 관리 페이지
   - [ ] DB 스키마 수정: `orders` 테이블에 배송 관련 컬럼 추가

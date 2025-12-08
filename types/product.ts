@@ -17,6 +17,7 @@ export interface Product {
   category: string | null;
   stock_quantity: number;
   is_active: boolean;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -38,5 +39,55 @@ export interface ProductQueryOptions {
 export interface ProductCardProps {
   product: Product;
   onClick?: () => void;
+}
+
+/**
+ * 상품 생성 입력 타입
+ */
+export interface CreateProductInput {
+  name: string;
+  description?: string | null;
+  price: number;
+  category?: string | null;
+  stock_quantity?: number;
+  is_active?: boolean;
+  image_url?: string | null;
+}
+
+/**
+ * 상품 수정 입력 타입
+ */
+export interface UpdateProductInput {
+  name?: string;
+  description?: string | null;
+  price?: number;
+  category?: string | null;
+  stock_quantity?: number;
+  is_active?: boolean;
+  image_url?: string | null;
+}
+
+/**
+ * 관리자 상품 목록 조회 옵션
+ */
+export interface AdminProductQueryOptions {
+  search?: string;
+  status?: "all" | "active" | "inactive";
+  category?: string;
+  sortBy?: "created_at" | "price" | "name" | "stock_quantity";
+  sortOrder?: "asc" | "desc";
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * 페이지네이션 응답 타입
+ */
+export interface PaginatedProductsResponse {
+  products: Product[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
