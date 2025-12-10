@@ -10,7 +10,10 @@
       "WebSearch",
       "WebFetch(domain:ai.google.dev)",
       "Bash(pnpm dev)",
-      "Bash(npx supabase db push:*)"
+      "Bash(npx supabase db push:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm lint:*)"
     ],
     "deny": [],
     "ask": []

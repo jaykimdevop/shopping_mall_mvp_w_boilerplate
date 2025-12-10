@@ -1,9 +1,11 @@
 import { MetadataRoute } from "next";
-import { createPublicSupabaseClient } from "@/lib/supabase/server-public";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * sitemap.xml 생성
  * 검색 엔진에 사이트 구조를 알려줍니다.
+ *
+ * Note: 정적 생성을 위해 cookies()를 사용하지 않고 직접 Supabase 클라이언트를 생성합니다.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://your-domain.vercel.app";
@@ -26,7 +28,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 동적 페이지: 상품 상세 페이지
   try {
-    const supabase = await createPublicSupabaseClient();
+    // 정적 생성을 위해 직접 Supabase 클라이언트 생성 (cookies 사용 안 함)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
     const { data: products } = await supabase
       .from("products")
       .select("id, updated_at")

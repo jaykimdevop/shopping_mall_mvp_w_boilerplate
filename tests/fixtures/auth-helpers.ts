@@ -92,3 +92,46 @@ export function getTestCredentials(): { email: string; password: string } {
   };
 }
 
+/**
+ * 관리자 테스트 계정 정보 가져오기
+ * 환경변수: TEST_ADMIN_EMAIL, TEST_ADMIN_PASSWORD
+ */
+export function getAdminCredentials(): { email: string; password: string } {
+  const email = process.env.TEST_ADMIN_EMAIL;
+  const password = process.env.TEST_ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.warn(
+      "관리자 테스트 계정 정보가 환경변수에 설정되지 않았습니다. " +
+        "TEST_ADMIN_EMAIL, TEST_ADMIN_PASSWORD 환경변수를 설정해주세요."
+    );
+  }
+
+  return {
+    email: email || "admin@example.com",
+    password: password || "adminpassword123",
+  };
+}
+
+/**
+ * 관리자로 로그인
+ */
+export async function loginAsAdmin(page: Page): Promise<void> {
+  const { email, password } = getAdminCredentials();
+  await loginWithClerk(page, email, password);
+}
+
+/**
+ * 관리자 페이지 접근 권한 확인
+ * 관리자가 아닌 경우 리다이렉트되는지 확인
+ */
+export async function checkAdminAccess(page: Page): Promise<boolean> {
+  try {
+    // 관리자 레이아웃의 사이드바가 표시되는지 확인
+    await page.waitForSelector('nav a[href="/admin"]', { timeout: 5000 });
+    return true;
+  } catch {
+    return false;
+  }
+}
+

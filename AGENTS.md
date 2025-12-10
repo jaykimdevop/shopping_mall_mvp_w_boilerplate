@@ -74,6 +74,17 @@ pnpm lint
    - `components/admin/user-tier-badge.tsx`: 등급 배지 컴포넌트
    - 역할(role)은 Clerk publicMetadata에서 관리, 등급(tier)은 Supabase users 테이블에서 관리
 
+6. **배송 관리 시스템** (Phase 22):
+   - `actions/admin/shipping.ts`: 배송 관리 Server Actions (getShippingList, updateTrackingNumber, markAsDelivered 등)
+   - `app/admin/shipping/page.tsx`: 배송 목록 페이지 (상태별 필터, 검색, 인라인 운송장 입력)
+   - `components/admin/bulk-tracking-modal.tsx`: 운송장 일괄 입력 모달
+   - `types/order.ts`: 배송 관련 타입 정의 (ShippingCarrier, SHIPPING_CARRIERS, SHIPPING_TRACKING_URLS)
+   - 주문 상세 페이지에 배송 정보 섹션 추가 (`app/admin/orders/[id]/page.tsx`)
+
+7. **자동 생성 타입** (Phase 23):
+   - `types/database.ts`: Supabase 스키마 기반 자동 생성 TypeScript 타입
+   - 수동 수정 금지, 스키마 변경 시 재생성 필요
+
 ### Directory Convention
 
 프로젝트 파일은 `app` 외부에 저장:
@@ -90,10 +101,19 @@ pnpm lint
   - `supabase/migrations/`: SQL 마이그레이션 파일들
   - `supabase/config.toml`: Supabase 프로젝트 설정
 
-**예정된 디렉토리** (아직 없지만 필요 시 생성):
+**기존 디렉토리**:
 
 - `actions/`: Server Actions (API 대신 우선 사용)
+  - `actions/admin/`: 관리자 전용 Server Actions
 - `types/`: TypeScript 타입 정의
+  - `types/database.ts`: Supabase 자동 생성 타입 (수정 금지)
+- `tests/`: E2E 테스트 (Playwright)
+  - `tests/e2e/`: 일반 페이지 테스트
+  - `tests/e2e/admin/`: 관리자 페이지 테스트
+  - `tests/fixtures/`: 테스트 헬퍼 및 데이터
+
+**예정된 디렉토리** (아직 없지만 필요 시 생성):
+
 - `constants/`: 상수 값들
 - `states/`: 전역 상태 (jotai 사용, 최소화)
 

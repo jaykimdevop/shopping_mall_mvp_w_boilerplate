@@ -302,9 +302,29 @@
     - `SHIPPING_TRACKING_URLS` (배송 조회 URL 패턴)
     - `ShippingStatus`, `AdminShippingQueryOptions`, `ShippingOrder`
 
-- [ ] Phase 23: 코드 정리 및 최적화
-  - [ ] 디버깅 로그 정리 (`actions/cart.ts`, `actions/order.ts`)
-  - [ ] 테스트 페이지 제거 또는 개발 환경 전용으로 분리
-  - [ ] 레거시 파일 정리 (`lib/supabase.ts` 제거 또는 deprecated 표시)
-  - [ ] TypeScript 타입 자동 생성 (`pnpm supabase gen types typescript`)
-  - [ ] 관리자 페이지 E2E 테스트 작성
+- [x] Phase 23: 코드 정리 및 최적화
+  - [x] 디버깅 로그 정리 (`actions/cart.ts`, `actions/order.ts`)
+    - `cart.ts`: 28개의 console.log/group 제거
+    - `order.ts`: 41개의 console.log/group 제거
+    - `console.error`는 실제 오류 로깅용으로 유지
+  - [x] 테스트 페이지 제거 또는 개발 환경 전용으로 분리
+    - 별도 테스트 페이지 파일 없음 (정리 불필요)
+  - [x] 레거시 파일 정리 (`lib/supabase.ts` 제거)
+    - 파일 삭제 완료 (이미 @deprecated 표시되어 있었고, 사용하는 곳 없음)
+  - [x] TypeScript 타입 자동 생성 (`types/database.ts`)
+    - Supabase MCP로 스키마 기반 타입 자동 생성
+    - 모든 테이블 타입 정의 (banners, cart_items, generated_images, order_items, orders, products, users)
+    - Tables, TablesInsert, TablesUpdate 헬퍼 타입 포함
+  - [x] 관리자 페이지 E2E 테스트 작성 (`tests/e2e/admin/`)
+    - `dashboard.spec.ts`: 대시보드 페이지 테스트 (통계 카드, 사이드바 네비게이션)
+    - `products.spec.ts`: 상품 관리 테스트 (목록, 검색, 필터, 등록)
+    - `orders.spec.ts`: 주문 관리 테스트 (목록, 상태 필터, 상태 변경)
+    - `banners.spec.ts`: 배너 관리 테스트 (목록, 등록, 활성화 토글)
+    - `users.spec.ts`: 회원 관리 테스트 (목록, 검색, 역할/등급 변경)
+    - `shipping.spec.ts`: 배송 관리 테스트 (목록, 운송장 입력, 배송 완료)
+    - 테스트 픽스처 업데이트 (`test-data.ts`, `auth-helpers.ts`)
+
+    ---
+
+## 5차 업데이트: 
+

@@ -148,7 +148,7 @@ export default function AdminShippingPage() {
         newParams.set("carrier", String(params.carrier));
       if (params.startDate) newParams.set("startDate", String(params.startDate));
       if (params.endDate) newParams.set("endDate", String(params.endDate));
-      if (params.page && params.page > 1)
+      if (params.page && Number(params.page) > 1)
         newParams.set("page", String(params.page));
 
       const queryString = newParams.toString();

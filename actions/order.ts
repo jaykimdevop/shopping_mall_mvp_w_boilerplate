@@ -41,20 +41,13 @@ export async function createOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
   try {
-    console.group("=== Create Order ===");
-    
     // 1. 인증 확인
     const { userId } = await auth();
     const isGuest = input.isGuest || !userId;
-    
-    console.log("Order type:", isGuest ? "Guest" : "Member");
-    console.log("User ID:", userId || "N/A");
 
     // 비회원인 경우 이메일 또는 전화번호 필수
     if (isGuest) {
       if (!input.guestEmail && !input.guestPhone) {
-        console.log("Guest order requires email or phone");
-        console.groupEnd();
         return {
           success: false,
           message: "비회원 주문 시 이메일 또는 전화번호가 필요합니다.",
@@ -62,8 +55,6 @@ export async function createOrder(
       }
       
       if (!input.guestCartItems || input.guestCartItems.length === 0) {
-        console.log("Guest cart is empty");
-        console.groupEnd();
         return {
           success: false,
           message: "장바구니가 비어있습니다.",
@@ -75,8 +66,6 @@ export async function createOrder(
     const { shippingAddress, orderNote, expectedTotal } = input;
     if (!shippingAddress || !shippingAddress.name || !shippingAddress.phone || 
         !shippingAddress.zipCode || !shippingAddress.address) {
-      console.log("Invalid shipping address:", shippingAddress);
-      console.groupEnd();
       return {
         success: false,
         message: "배송지 정보를 모두 입력해주세요.",
@@ -85,7 +74,6 @@ export async function createOrder(
 
     // Supabase 클라이언트 생성
     const supabase = await createClerkSupabaseClient();
-    console.log("Supabase client created");
 
     // 2. 장바구니 아이템 조회
     let cartItems: Array<{ product_id: string; quantity: number }>;
@@ -93,10 +81,8 @@ export async function createOrder(
     if (isGuest) {
       // 비회원: 클라이언트에서 전달받은 장바구니 사용
       cartItems = input.guestCartItems!;
-      console.log("Using guest cart items:", cartItems.length);
     } else {
       // 회원: DB에서 장바구니 조회
-      console.log("Fetching cart items from DB...");
       const { data: dbCartItems, error: cartError } = await supabase
         .from("cart_items")
         .select("*")
@@ -104,7 +90,6 @@ export async function createOrder(
 
       if (cartError) {
         console.error("Cart fetch error:", cartError);
-        console.groupEnd();
         return {
           success: false,
           message: `장바구니 조회에 실패했습니다: ${cartError.message}`,
@@ -112,8 +97,6 @@ export async function createOrder(
       }
 
       if (!dbCartItems || dbCartItems.length === 0) {
-        console.log("Cart is empty");
-        console.groupEnd();
         return {
           success: false,
           message: "장바구니가 비어있습니다.",
@@ -122,12 +105,9 @@ export async function createOrder(
       
       cartItems = dbCartItems;
     }
-    
-    console.log("Cart items count:", cartItems.length);
 
     // 상품 정보 조회
     const productIds = cartItems.map((item) => item.product_id);
-    console.log("Fetching products:", productIds);
     const { data: products, error: productsError } = await supabase
       .from("products")
       .select("*")
@@ -135,7 +115,6 @@ export async function createOrder(
 
     if (productsError || !products) {
       console.error("Products fetch error:", productsError);
-      console.groupEnd();
       return {
         success: false,
         message: `상품 정보 조회에 실패했습니다: ${productsError?.message || "데이터 없음"}`,
@@ -146,7 +125,6 @@ export async function createOrder(
     const productMap = new Map(products.map((p) => [p.id, p]));
 
     // 3. 재고 확인
-    console.log("Checking stock...");
     const stockErrors: string[] = [];
     for (const item of cartItems) {
       const product = productMap.get(item.product_id);
@@ -166,37 +144,27 @@ export async function createOrder(
     }
 
     if (stockErrors.length > 0) {
-      console.log("Stock errors:", stockErrors);
-      console.groupEnd();
       return {
         success: false,
         message: stockErrors.join("\n"),
       };
     }
-    console.log("Stock check passed");
 
     // 4. 합계 검증 (클라이언트 vs 서버 계산)
-    console.log("Validating total...");
     const serverTotal = cartItems.reduce((sum, item) => {
       const product = productMap.get(item.product_id);
       return sum + (product?.price || 0) * item.quantity;
     }, 0);
-
-    console.log("Expected total:", expectedTotal, "Server total:", serverTotal);
     
     // 소수점 오차를 고려하여 비교 (1원 이내 차이는 허용)
     if (Math.abs(serverTotal - expectedTotal) > 1) {
-      console.log("Total mismatch detected");
-      console.groupEnd();
       return {
         success: false,
         message: `주문 금액이 일치하지 않습니다. 장바구니를 다시 확인해주세요. (예상: ${expectedTotal}원, 실제: ${serverTotal}원)`,
       };
     }
-    console.log("Total validation passed");
 
     // 5. orders 테이블에 주문 생성
-    console.log("Creating order...");
     const orderData: Record<string, unknown> = {
       total_amount: serverTotal,
       status: "pending",
@@ -222,16 +190,13 @@ export async function createOrder(
 
     if (orderError || !newOrder) {
       console.error("Order creation error:", orderError);
-      console.groupEnd();
       return {
         success: false,
         message: `주문 생성에 실패했습니다: ${orderError?.message || "데이터 없음"}`,
       };
     }
-    console.log("Order created:", newOrder.id);
 
     // 6. order_items 테이블에 주문 상세 저장
-    console.log("Creating order items...");
     const orderItems = cartItems.map((item) => {
       const product = productMap.get(item.product_id)!;
       return {
@@ -251,16 +216,13 @@ export async function createOrder(
       console.error("Order items creation error:", orderItemsError);
       // 주문 아이템 생성 실패 시 주문 삭제 (롤백)
       await supabase.from("orders").delete().eq("id", newOrder.id);
-      console.groupEnd();
       return {
         success: false,
         message: `주문 상세 저장에 실패했습니다: ${orderItemsError.message}`,
       };
     }
-    console.log("Order items created:", orderItems.length);
 
     // 7. 재고 차감
-    console.log("Deducting stock...");
     for (const item of cartItems) {
       const product = productMap.get(item.product_id)!;
       const newStock = product.stock_quantity - item.quantity;
@@ -275,11 +237,9 @@ export async function createOrder(
         // 재고 차감 실패는 로그만 남기고 계속 진행 (주문은 이미 생성됨)
       }
     }
-    console.log("Stock deducted");
 
     // 8. 장바구니 비우기 (회원인 경우만)
     if (!isGuest && userId) {
-      console.log("Clearing cart...");
       const { error: clearCartError } = await supabase
         .from("cart_items")
         .delete()
@@ -289,9 +249,6 @@ export async function createOrder(
         console.error("Clear cart error:", clearCartError);
         // 장바구니 삭제 실패는 로그만 남기고 계속 진행 (주문은 이미 생성됨)
       }
-      console.log("Cart cleared");
-    } else {
-      console.log("Guest order - client will clear local storage cart");
     }
 
     // 생성된 주문 조회 (order_items 포함)
@@ -315,9 +272,6 @@ export async function createOrder(
       order_items: fetchedOrderItems || [],
     };
 
-    console.log("Order completed successfully:", order.id);
-    console.groupEnd();
-
     return {
       success: true,
       message: "주문이 완료되었습니다.",
@@ -325,7 +279,6 @@ export async function createOrder(
     };
   } catch (error) {
     console.error("Create order error:", error);
-    console.groupEnd();
     
     const errorMessage = error instanceof Error ? error.message : String(error);
     
@@ -628,4 +581,3 @@ export async function getGuestOrder(
     };
   }
 }
-
