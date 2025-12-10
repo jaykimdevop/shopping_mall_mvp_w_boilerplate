@@ -13,7 +13,12 @@
       "Bash(npx supabase db push:*)",
       "Bash(pnpm tsc:*)",
       "Bash(pnpm build:*)",
-      "Bash(pnpm lint:*)"
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(cmd //c \"del pnpm-lock.yaml\")",
+      "Bash(git check-ignore:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
