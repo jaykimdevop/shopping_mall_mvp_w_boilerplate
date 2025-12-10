@@ -11,7 +11,7 @@
 !.yarn/versions
 
 # pnpm
-pnpm-lock.yaml
+# Note: pnpm-lock.yaml should be committed for reproducible builds
 
 # testing
 /coverage
